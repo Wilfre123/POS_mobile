@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">BluePOS</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="bluepos_system_title">BluePOS System</string>
+    <string name="ecosystem_subtitle">Connected Arduino POS Ecosystem</string>
+    <string name="pos_title">Point of Sale</string>
+    <string name="inventory_title">Inventory Management</string>
+    <string name="arduino_title">Arduino Control</string>
+    <string name="reports_title">Sales Reports</string>
+</resources>

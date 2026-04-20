@@ -1,0 +1,41 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
+    <application
+        android:allowBackup="true"
+        android:label="POS &amp; LED Controller"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.BluePOS">
+
+        <activity android:name="com.example.bluepos.LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <activity android:name="com.example.bluepos.RegisterActivity"
+            android:exported="false" />
+
+        <activity android:name="com.example.bluepos.ProductsActivity"
+            android:label="Products Management"
+            android:exported="false" />
+
+        <activity android:name="com.example.bluepos.MainActivity"
+            android:exported="false">
+        </activity>
+
+        <activity android:name="com.example.bluepos.pos.POSActivity"
+            android:label="POS System"
+            android:exported="false" />
+
+    </application>
+</manifest>

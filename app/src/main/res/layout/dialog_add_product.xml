@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add New Product"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary_green"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/etName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Item Name"
+            android:inputType="text"/>
+
+        <EditText
+            android:id="@+id/etCost"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Cost Price"
+            android:inputType="numberDecimal"/>
+
+        <EditText
+            android:id="@+id/etPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Selling Price"
+            android:inputType="numberDecimal"/>
+
+        <EditText
+            android:id="@+id/etQuantity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Initial Quantity"
+            android:inputType="number"/>
+
+        <EditText
+            android:id="@+id/etLimit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Quantity Limit (Low Stock Warning)"
+            android:inputType="number"/>
+
+        <Spinner
+            android:id="@+id/spinnerCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:minHeight="48dp" />
+
+        <EditText
+            android:id="@+id/etCustomCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Or enter new category"
+            android:inputType="text"
+            android:visibility="gone"
+            android:layout_marginTop="4dp"/>
+
+    </LinearLayout>
+</ScrollView>
