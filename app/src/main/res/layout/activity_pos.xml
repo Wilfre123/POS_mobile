@@ -95,17 +95,6 @@
                     app:layout_constraintBottom_toTopOf="@id/bottom_bar"
                     app:layout_constraintTop_toBottomOf="@id/etSearch" />
 
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/btnAddProduct"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    android:src="@android:drawable/ic_input_add"
-                    app:backgroundTint="@color/primary_green"
-                    app:layout_constraintBottom_toTopOf="@id/bottom_bar"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:tint="@color/white" />
-
                 <!-- Bottom Bar (Updated: Total, Change, and Payment) -->
                 <LinearLayout
                     android:id="@+id/bottom_bar"
