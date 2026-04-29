@@ -8,11 +8,13 @@
     app:cardElevation="2dp">
 
     <LinearLayout
+        android:id="@+id/productItemLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="12dp"
-        android:gravity="center">
+        android:gravity="center"
+        android:background="?attr/selectableItemBackground">
 
         <TextView
             android:id="@+id/tvProductName"
@@ -44,6 +46,17 @@
             android:textSize="11sp"
             android:textColor="@color/gray_text"
             android:layout_marginTop="2dp" />
+
+        <TextView
+            android:id="@+id/tvAddedToCartCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Added: 0"
+            android:textSize="11sp"
+            android:textColor="@color/primary_green"
+            android:textStyle="bold"
+            android:layout_marginTop="2dp"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/btnAddToCart"

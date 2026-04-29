@@ -1,21 +1,29 @@
 package com.example.bluepos.pos;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.DialogInterface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -23,11 +31,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.bluepos.LoginActivity;
-import com.example.bluepos.MainActivity;
-import com.example.bluepos.ProductsActivity;
-import com.example.bluepos.R;
-import com.github.mikephil.charting.charts.BarChart;
+
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -36,44 +40,61 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+
+import com.example.bluepos.R;
+import com.example.bluepos.ProductsActivity;
+import com.example.bluepos.SettingsActivity;
+import com.example.bluepos.LoginActivity;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
-public class POSActivity extends AppCompatActivity implements ProductAdapter.OnAddToCartListener {
+public class POSActivity extends AppCompatActivity {
 
     private AppDatabase db;
     private ProductAdapter adapter;
     private List<CartItem> cart = new ArrayList<>();
     private double totalAmount = 0.0;
-    private Button btnCheckout;
+    private Button btnCheckout, btnCheckout2;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private EditText etAmountPaid, etSearch, etSearchCart;
-    private TextView tvChange, tvCartTotal;
+    private TextView tvChange, tvCartTotal, tvCartTotal2;
     private RecyclerView rvCart, rvSalesHistory;
     private CartAdapter cartAdapter;
     private SaleAdapter saleAdapter;
-    private View cashierContent, dashboardContent, reportsContent, salesHistoryContent, cartContent, statisticsContent;
+    private View cashierContent, dashboardContent, reportsContent, salesHistoryContent, cartContent, statisticsContent, reservations_content, debts_content, settingsContent;
     private ImageButton btnViewCart;
-    private TextView tvNetIncome, tvTotalRevenue, tvTotalExpenses, tvTodaySales, tvTotalProducts, tvTotalSalesCount, tvItemsSold, tvLowStock, tvStatsTotalRevenue, tvStatsTotalExpenses, tvStatsNetIncome;
+    private RecyclerView rvReservations, rvDebts;
+    private ReservationAdapter reservationAdapter;
+    private DebtAdapter debtAdapter;
+    private List<Reservation> reservations = new ArrayList<>();
+    private List<Debt> debts = new ArrayList<>();
+
+    private TextView tvNetIncome, tvTotalRevenue, tvTotalExpenses, tvTodaySales, tvTotalProducts, tvTotalSalesCount, tvItemsSold, tvLowStock;
+    private TextView tvStatsTotalRevenue, tvStatsTotalExpenses, tvStatsNetIncome;
     private LineChart revenueChart, expenseRevenueChart;
     private HorizontalBarChart topProductsChart;
     private PieChart salesCategoryChart, stockCategoryChart;
@@ -82,122 +103,113 @@ public class POSActivity extends AppCompatActivity implements ProductAdapter.OnA
     private Button btnExportProducts;
 
     private int userId;
-    private androidx.activity.result.ActivityResultLauncher<String> createDocumentLauncher;
+
+    private final ActivityResultLauncher<String> createDocumentLauncher = registerForActivityResult(
+            new ActivityResultContracts.CreateDocument("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+            uri -> {
+                if (uri != null) {
+                    saveExcelToUri(uri);
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pos);
 
-        db = AppDatabase.getInstance(this);
-        
-        android.content.SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-        userId = prefs.getInt("userId", -1);
+        userId = getIntent().getIntExtra("USER_ID", -1);
+        if (userId == -1) {
+            android.content.SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+            userId = prefs.getInt("userId", -1);
+        }
+
+        if (userId == -1) {
+            Toast.makeText(this, "Session error", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        db = AppDatabase.getDatabase(this);
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        navigationView.setNavigationItemSelectedListener(item -> {
-            int id = item.getItemId();
-            drawerLayout.closeDrawer(GravityCompat.START);
-
-            if (id == R.id.nav_pos || id == R.id.nav_cashier) {
-                switchContent(cashierContent, "Cashier");
-            } else if (id == R.id.nav_dashboard) {
-                showDashboard();
-            } else if (id == R.id.nav_statistics) {
-                showStatistics();
-            } else if (id == R.id.nav_reports) {
-                switchContent(reportsContent, "Reports");
-            } else if (id == R.id.nav_sales_history) {
-                showSalesHistoryPage();
-            } else if (id == R.id.nav_products) {
-                startActivity(new Intent(this, ProductsActivity.class));
-            } else if (id == R.id.nav_logout) {
-                showLogoutDialog();
-            } else {
-                Toast.makeText(this, "Feature coming soon: " + item.getTitle(), Toast.LENGTH_SHORT).show();
-            }
-            return true;
-        });
-
-        RecyclerView rvProducts = findViewById(R.id.rvProducts);
-        btnCheckout = findViewById(R.id.btnCheckout);
-        FloatingActionButton btnAddProduct = findViewById(R.id.btnAddProduct);
-        etAmountPaid = findViewById(R.id.etAmountPaid);
-        tvChange = findViewById(R.id.tvChange);
-        etSearch = findViewById(R.id.etSearch);
-        
-        // Content Views Initialization
         cashierContent = findViewById(R.id.cashier_content);
         dashboardContent = findViewById(R.id.dashboard_content);
         reportsContent = findViewById(R.id.reports_content);
-        btnExportProducts = findViewById(R.id.btnExportProducts);
         salesHistoryContent = findViewById(R.id.sales_history_content);
         cartContent = findViewById(R.id.cart_content);
         statisticsContent = findViewById(R.id.statistics_content);
+        reservations_content = findViewById(R.id.reservations_content);
+        debts_content = findViewById(R.id.debts_content);
+        settingsContent = findViewById(R.id.settings_content);
 
-        // Cart Panel Initialization
-        rvCart = findViewById(R.id.rvCart);
-        tvCartTotal = findViewById(R.id.tvCartTotal);
-        etSearchCart = findViewById(R.id.etSearchCart);
-        btnViewCart = findViewById(R.id.btnViewCart);
-        rvSalesHistory = findViewById(R.id.rvSales);
-
-        btnViewCart.setOnClickListener(v -> switchContent(cartContent, "Current Order"));
-
-        btnExportProducts.setOnClickListener(v -> exportProductsToExcel());
-
-        initDashboardViews();
-
+        RecyclerView rvProducts = findViewById(R.id.rvProducts);
         rvProducts.setLayoutManager(new GridLayoutManager(this, 2));
-        rvCart.setLayoutManager(new GridLayoutManager(this, 2)); // Two column grid for cart
-        rvSalesHistory.setLayoutManager(new LinearLayoutManager(this));
-        
-        setupCartAdapter();
-        refreshProductList();
 
-        btnAddProduct.setOnClickListener(v -> showAddProductDialog());
+        adapter = new ProductAdapter(new ArrayList<>(), this::onAddToCart);
+        rvProducts.setAdapter(adapter);
 
-        btnCheckout.setOnClickListener(v -> {
-            if (cart.isEmpty()) {
-                Toast.makeText(this, "Cart is empty!", Toast.LENGTH_SHORT).show();
-            } else {
-                double paid = getPaidAmount();
-                if (paid < totalAmount) {
-                    Toast.makeText(this, "Insufficient payment!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                
-                // Deduct stock and build items summary
-                StringBuilder summary = new StringBuilder();
-                for (int i = 0; i < cart.size(); i++) {
-                    CartItem item = cart.get(i);
-                    db.productDao().update(item.product);
-                    summary.append(item.product.name).append(" x").append(item.quantity);
-                    if (i < cart.size() - 1) summary.append(", ");
-                }
-
-                // Save Sale to Database
-                double change = paid - totalAmount;
-                Sale sale = new Sale(totalAmount, paid, change, System.currentTimeMillis(), summary.toString(), userId);
-                db.saleDao().insert(sale);
-
-                Toast.makeText(this, "Sale Completed! Change: ₱" + String.format(Locale.US, "%.2f", change), Toast.LENGTH_LONG).show();
-                cart.clear();
-                totalAmount = 0.0;
-                etAmountPaid.setText("");
-                updateTotals();
-                refreshProductList();
+        etSearch = findViewById(R.id.etSearch);
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterProducts(s.toString());
             }
+            @Override
+            public void afterTextChanged(Editable s) {}
         });
+
+        setupCartAdapter();
+        btnCheckout = findViewById(R.id.btnCheckout);
+        btnCheckout2 = findViewById(R.id.btnCheckout2);
+        etAmountPaid = findViewById(R.id.etAmountPaid);
+        tvChange = findViewById(R.id.tvChange);
+
+        View.OnClickListener checkoutListener = v -> {
+            if (cart.isEmpty()) {
+                Toast.makeText(this, "Cart is empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            double paid = getPaidAmount();
+            if (paid < totalAmount) {
+                Toast.makeText(this, "Insufficient payment", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            StringBuilder summary = new StringBuilder();
+            for (CartItem item : cart) {
+                summary.append(item.product.name).append(" x").append(item.quantity).append(", ");
+                
+                // Update product stock
+                item.product.stock -= item.quantity;
+                db.productDao().update(item.product);
+            }
+
+            Sale sale = new Sale(totalAmount, paid, paid - totalAmount, System.currentTimeMillis(), summary.toString(), userId);
+            db.saleDao().insert(sale);
+
+            cart.clear();
+            cartAdapter.notifyDataSetChanged();
+            updateTotals();
+            refreshProductList();
+            updateNotificationBadge();
+            Toast.makeText(this, "Checkout successful", Toast.LENGTH_SHORT).show();
+            switchContent(cashierContent, "BluePOS System");
+        };
+
+        btnCheckout.setOnClickListener(checkoutListener);
+        btnCheckout2.setOnClickListener(checkoutListener);
 
         etAmountPaid.addTextChangedListener(new TextWatcher() {
             @Override
@@ -210,16 +222,166 @@ public class POSActivity extends AppCompatActivity implements ProductAdapter.OnA
             public void afterTextChanged(Editable s) {}
         });
 
-        etSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterProducts(s.toString());
-            }
-            @Override
-            public void afterTextChanged(Editable s) {}
+        btnViewCart = findViewById(R.id.btnViewCart);
+        btnViewCart.setOnClickListener(v -> switchContent(cartContent, "Cart"));
+
+        rvSalesHistory = findViewById(R.id.rvSales);
+        rvSalesHistory.setLayoutManager(new LinearLayoutManager(this));
+        saleAdapter = new SaleAdapter(new ArrayList<>());
+        rvSalesHistory.setAdapter(saleAdapter);
+
+        rvReservations = findViewById(R.id.rvReservations);
+        rvReservations.setLayoutManager(new LinearLayoutManager(this));
+        setupReservationAdapter();
+
+        rvDebts = findViewById(R.id.rvDebts);
+        rvDebts.setLayoutManager(new LinearLayoutManager(this));
+        setupDebtAdapter();
+
+        findViewById(R.id.btnAddReservation).setOnClickListener(v -> showAddReservationDialog());
+        findViewById(R.id.btnAddDebt).setOnClickListener(v -> showAddDebtDialog());
+
+        initDashboardViews();
+        setupChart();
+
+        btnNotification = findViewById(R.id.btnNotification);
+        tvNotificationBadge = findViewById(R.id.tvNotificationBadge);
+        btnNotification.setOnClickListener(v -> showLowStockDialog());
+
+        btnExportProducts = findViewById(R.id.btnExportProducts);
+        if (btnExportProducts != null) {
+            btnExportProducts.setOnClickListener(v -> exportProductsToExcel());
+        }
+
+        // Setup settings buttons
+        findViewById(R.id.cardEditProfile).setOnClickListener(v -> {
+            startActivity(new Intent(this, SettingsActivity.class).putExtra("ACTION", "EDIT_PROFILE"));
         });
+        findViewById(R.id.cardExportData).setOnClickListener(v -> {
+            startActivity(new Intent(this, SettingsActivity.class).putExtra("ACTION", "EXPORT"));
+        });
+        findViewById(R.id.cardImportData).setOnClickListener(v -> {
+            startActivity(new Intent(this, SettingsActivity.class).putExtra("ACTION", "IMPORT"));
+        });
+        findViewById(R.id.cardResetData).setOnClickListener(v -> {
+            startActivity(new Intent(this, SettingsActivity.class).putExtra("ACTION", "RESET"));
+        });
+
+        // Handle TARGET_VIEW intent
+        String targetView = getIntent().getStringExtra("TARGET_VIEW");
+        if ("REPORTS".equals(targetView)) {
+            switchContent(reportsContent, "Reports");
+        } else if ("SETTINGS".equals(targetView)) {
+            switchContent(settingsContent, "Settings");
+        } else if ("DASHBOARD".equals(targetView)) {
+            showDashboard();
+        } else if ("STATISTICS".equals(targetView)) {
+            showStatistics();
+        } else if ("SALES_HISTORY".equals(targetView)) {
+            showSalesHistoryPage();
+        } else if ("RESERVATIONS".equals(targetView)) {
+            showReservationsPage();
+        } else if ("DEBTS".equals(targetView)) {
+            showDebtsPage();
+        }
+
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_pos) {
+                switchContent(cashierContent, "BluePOS System");
+            } else if (id == R.id.nav_dashboard) {
+                showDashboard();
+            } else if (id == R.id.nav_products) {
+                startActivity(new Intent(POSActivity.this, ProductsActivity.class));
+            } else if (id == R.id.nav_reports) {
+                switchContent(reportsContent, "Reports");
+            } else if (id == R.id.nav_sales_history) {
+                showSalesHistoryPage();
+            } else if (id == R.id.nav_statistics) {
+                showStatistics();
+            } else if (id == R.id.nav_reservations) {
+                showReservationsPage();
+            } else if (id == R.id.nav_debts) {
+                showDebtsPage();
+            } else if (id == R.id.nav_settings) {
+                switchContent(settingsContent, "Settings");
+            } else if (id == R.id.nav_logout) {
+                showLogoutDialog();
+            }
+            drawerLayout.closeDrawer(GravityCompat.START);
+            return true;
+        });
+
+        // Initialize with POS content
+        switchContent(cashierContent, "BluePOS System");
+        
+        refreshProductList();
+        updateNotificationBadge();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+            } else {
+                if (cashierContent.getVisibility() == View.VISIBLE) {
+                    drawerLayout.openDrawer(GravityCompat.START);
+                } else {
+                    switchContent(cashierContent, "BluePOS System");
+                }
+            }
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshProductList();
+        updateNotificationBadge();
+        if (dashboardContent.getVisibility() == View.VISIBLE) updateDashboardData();
+    }
+
+    private void setupCartAdapter() {
+        rvCart = findViewById(R.id.rvCart);
+        tvCartTotal = findViewById(R.id.tvCartTotal);
+        tvCartTotal2 = findViewById(R.id.tvCartTotal2);
+        etSearchCart = findViewById(R.id.etSearchCart);
+
+        rvCart.setLayoutManager(new LinearLayoutManager(this));
+        cartAdapter = new CartAdapter(cart, new CartAdapter.OnCartActionListener() {
+            @Override
+            public void onIncrease(CartItem item) {
+                if (item.quantity < item.product.stock) {
+                    item.quantity++;
+                    cartAdapter.notifyDataSetChanged();
+                    updateTotals();
+                } else {
+                    Toast.makeText(POSActivity.this, "Not enough stock", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onDecrease(CartItem item) {
+                if (item.quantity > 1) {
+                    item.quantity--;
+                } else {
+                    cart.remove(item);
+                }
+                cartAdapter.notifyDataSetChanged();
+                updateTotals();
+            }
+
+            @Override
+            public void onRemove(CartItem item) {
+                cart.remove(item);
+                cartAdapter.notifyDataSetChanged();
+                updateTotals();
+            }
+        });
+        rvCart.setAdapter(cartAdapter);
 
         etSearchCart.addTextChangedListener(new TextWatcher() {
             @Override
@@ -231,80 +393,16 @@ public class POSActivity extends AppCompatActivity implements ProductAdapter.OnA
             @Override
             public void afterTextChanged(Editable s) {}
         });
-
-        btnNotification = findViewById(R.id.btnNotification);
-        tvNotificationBadge = findViewById(R.id.tvNotificationBadge);
-        btnNotification.setOnClickListener(v -> showLowStockDialog());
-        updateNotificationBadge();
-
-        createDocumentLauncher = registerForActivityResult(
-                new androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
-                uri -> {
-                    if (uri != null) {
-                        saveExcelToUri(uri);
-                    }
-                }
-        );
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        refreshProductList();
-        updateNotificationBadge();
-    }
-
-    private void setupCartAdapter() {
-        cartAdapter = new CartAdapter(cart, new CartAdapter.OnCartActionListener() {
-            @Override
-            public void onIncrease(CartItem item) {
-                if (item.product.quantity > 0) {
-                    item.product.quantity--;
-                    item.quantity++;
-                    updateTotals();
-                    notifyAdapters();
-                    updateNotificationBadge();
-                } else {
-                    Toast.makeText(POSActivity.this, "No more stock!", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onDecrease(CartItem item) {
-                if (item.quantity > 1) {
-                    item.product.quantity++;
-                    item.quantity--;
-                    updateTotals();
-                    notifyAdapters();
-                    updateNotificationBadge();
-                }
-            }
-
-            @Override
-            public void onRemove(CartItem item) {
-                item.product.quantity += item.quantity;
-                cart.remove(item);
-                updateTotals();
-                notifyAdapters();
-                updateNotificationBadge();
-            }
-        });
-        rvCart.setAdapter(cartAdapter);
     }
 
     private void filterCart(String query) {
-        String q = query.toLowerCase().trim();
-        List<CartItem> filtered = new ArrayList<>();
-        if (q.isEmpty()) {
-            filtered.addAll(cart);
-        } else {
-            for (CartItem item : cart) {
-                if (item.product.name.toLowerCase().contains(q)) {
-                    filtered.add(item);
-                }
+        List<CartItem> filteredList = new ArrayList<>();
+        for (CartItem item : cart) {
+            if (item.product.name.toLowerCase().contains(query.toLowerCase())) {
+                filteredList.add(item);
             }
         }
-        if (cartAdapter != null) cartAdapter.updateList(filtered);
+        cartAdapter.updateList(filteredList);
     }
 
     private void updateTotals() {
@@ -312,110 +410,63 @@ public class POSActivity extends AppCompatActivity implements ProductAdapter.OnA
         for (CartItem item : cart) {
             totalAmount += item.product.price * item.quantity;
         }
-        String totalStr = String.format(Locale.US, "Total: ₱%.2f", totalAmount);
-        if (tvCartTotal != null) tvCartTotal.setText(totalStr);
+        String totalStr = String.format("Total: ₱%.2f", totalAmount);
+        tvCartTotal.setText(totalStr);
+        if (tvCartTotal2 != null) tvCartTotal2.setText(totalStr);
         updateCheckoutButton();
         calculateChange();
     }
 
     private void notifyAdapters() {
-        if (adapter != null) adapter.notifyDataSetChanged();
-        if (cartAdapter != null) cartAdapter.notifyDataSetChanged();
+        adapter.notifyDataSetChanged();
+        cartAdapter.notifyDataSetChanged();
     }
 
     private void calculateChange() {
         double paid = getPaidAmount();
         double change = paid - totalAmount;
-        if (change < 0) change = 0;
-        tvChange.setText(String.format(Locale.US, "Change: ₱%.2f", change));
+        tvChange.setText(String.format("Change: ₱%.2f", Math.max(0, change)));
     }
 
     private double getPaidAmount() {
+        String s = etAmountPaid.getText().toString();
+        if (s.isEmpty()) return 0;
         try {
-            String s = etAmountPaid.getText().toString();
-            return s.isEmpty() ? 0 : Double.parseDouble(s);
-        } catch (NumberFormatException e) {
+            return Double.parseDouble(s);
+        } catch (Exception e) {
             return 0;
         }
     }
 
     private void filterProducts(String query) {
-        List<Product> filtered;
-        if (query.isEmpty()) {
-            filtered = db.productDao().getAll(userId);
-        } else {
-            filtered = db.productDao().searchProducts(userId, query);
-        }
-        if (adapter != null) adapter.updateList(filtered);
+        List<Product> filtered = db.productDao().searchProducts(userId, query);
+        adapter.updateList(filtered);
     }
 
-    private void showAddProductDialog() {
-        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_product, null);
-        EditText etName = dialogView.findViewById(R.id.etName);
-        EditText etCost = dialogView.findViewById(R.id.etCost);
-        EditText etPrice = dialogView.findViewById(R.id.etPrice);
-        EditText etQuantity = dialogView.findViewById(R.id.etQuantity);
-        EditText etLimit = dialogView.findViewById(R.id.etLimit);
-        android.widget.Spinner spinnerCategory = dialogView.findViewById(R.id.spinnerCategory);
-
-        String[] categories = {"General", "Food", "Beverages", "Electronics", "Clothing", "Others"};
-        android.widget.ArrayAdapter<String> catAdapter = new android.widget.ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
-        catAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerCategory.setAdapter(catAdapter);
-
-        new AlertDialog.Builder(this)
-                .setView(dialogView)
-                .setPositiveButton("Add", (dialog, which) -> {
-                    String name = etName.getText().toString();
-                    double cost = Double.parseDouble(etCost.getText().toString().isEmpty() ? "0" : etCost.getText().toString());
-                    double price = Double.parseDouble(etPrice.getText().toString().isEmpty() ? "0" : etPrice.getText().toString());
-                    int qty = Integer.parseInt(etQuantity.getText().toString().isEmpty() ? "0" : etQuantity.getText().toString());
-                    int limit = Integer.parseInt(etLimit.getText().toString().isEmpty() ? "0" : etLimit.getText().toString());
-                    String category = spinnerCategory.getSelectedItem().toString();
-
-                    Product p = new Product(name, cost, price, qty, limit, category, userId);
-                    db.productDao().insert(p);
-                    refreshProductList();
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
-    }
-
-    private void refreshProductList() {
-        List<Product> products = db.productDao().getAll(userId);
-        if (adapter == null) {
-            adapter = new ProductAdapter(products, this);
-            ((RecyclerView)findViewById(R.id.rvProducts)).setAdapter(adapter);
-        } else {
-            adapter.updateList(products);
-        }
-    }
-
-    @Override
-    public void onAddToCart(Product product) {
-        if (product.quantity <= 0) {
-            Toast.makeText(this, "Out of Stock!", Toast.LENGTH_SHORT).show();
+    private void onAddToCart(Product product) {
+        if (product.stock <= 0) {
+            Toast.makeText(this, "Out of stock", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        product.quantity--; // Instant subtraction from UI object
-        
-        boolean found = false;
         for (CartItem item : cart) {
             if (item.product.id == product.id) {
-                item.quantity++;
-                found = true;
-                break;
+                if (item.quantity < product.stock) {
+                    item.quantity++;
+                    cartAdapter.notifyDataSetChanged();
+                    updateTotals();
+                    Toast.makeText(this, "Added to cart", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Max stock reached", Toast.LENGTH_SHORT).show();
+                }
+                return;
             }
         }
-        
-        if (!found) {
-            cart.add(new CartItem(product, 1));
-        }
 
+        cart.add(new CartItem(product, 1));
+        cartAdapter.notifyDataSetChanged();
         updateTotals();
-        notifyAdapters();
-        updateNotificationBadge();
+        Toast.makeText(this, "Added to cart", Toast.LENGTH_SHORT).show();
     }
 
     private void showDashboard() {
@@ -441,259 +492,315 @@ public class POSActivity extends AppCompatActivity implements ProductAdapter.OnA
         salesCategoryChart = findViewById(R.id.salesCategoryChart);
         stockCategoryChart = findViewById(R.id.stockCategoryChart);
 
-        expenseRevenueChart = findViewById(R.id.expenseRevenueChart);
-        topProductsChart = findViewById(R.id.topProductsChart);
         tvStatsTotalRevenue = findViewById(R.id.tvStatsTotalRevenue);
         tvStatsTotalExpenses = findViewById(R.id.tvStatsTotalExpenses);
         tvStatsNetIncome = findViewById(R.id.tvStatsNetIncome);
-
-        setupChart();
+        expenseRevenueChart = findViewById(R.id.expenseRevenueChart);
+        topProductsChart = findViewById(R.id.topProductsChart);
     }
 
     private void setupChart() {
-        if (revenueChart != null) {
-            revenueChart.getDescription().setEnabled(false);
-            revenueChart.setDrawGridBackground(false);
-            revenueChart.getLegend().setEnabled(false);
-            revenueChart.getXAxis().setDrawGridLines(false);
-            revenueChart.getAxisLeft().setDrawGridLines(false);
-            revenueChart.getAxisRight().setEnabled(false);
-        }
+        revenueChart.getDescription().setEnabled(false);
+        revenueChart.setDrawGridBackground(false);
+        revenueChart.getLegend().setEnabled(true);
 
-        setupPieChart(salesCategoryChart);
-        setupPieChart(stockCategoryChart);
+        XAxis xAxis = revenueChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setGranularity(1f);
 
-        if (expenseRevenueChart != null) {
-            expenseRevenueChart.getDescription().setEnabled(false);
-            expenseRevenueChart.setDrawGridBackground(false);
-            expenseRevenueChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-            expenseRevenueChart.getXAxis().setDrawGridLines(false);
-            expenseRevenueChart.getAxisLeft().setDrawGridLines(false);
-            expenseRevenueChart.getAxisRight().setEnabled(false);
-            expenseRevenueChart.getLegend().setEnabled(true);
-        }
+        revenueChart.getAxisRight().setEnabled(false);
 
-        if (topProductsChart != null) {
-            topProductsChart.getDescription().setEnabled(false);
-            topProductsChart.setDrawGridBackground(false);
-            topProductsChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-            topProductsChart.getXAxis().setDrawGridLines(false);
-            topProductsChart.getAxisLeft().setDrawGridLines(false);
-            topProductsChart.getAxisRight().setEnabled(false);
-        }
+        // Stats Chart
+        expenseRevenueChart.getDescription().setEnabled(false);
+        expenseRevenueChart.getLegend().setEnabled(true);
+        XAxis exXAxis = expenseRevenueChart.getXAxis();
+        exXAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        exXAxis.setDrawGridLines(false);
+        expenseRevenueChart.getAxisRight().setEnabled(false);
+
+        // Top Products Chart
+        topProductsChart.getDescription().setEnabled(false);
+        topProductsChart.setDrawGridBackground(false);
+        XAxis topXAxis = topProductsChart.getXAxis();
+        topXAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        topXAxis.setDrawGridLines(false);
+        topProductsChart.getAxisRight().setEnabled(false);
     }
 
     private void setupPieChart(PieChart pieChart) {
-        if (pieChart == null) return;
         pieChart.setUsePercentValues(true);
         pieChart.getDescription().setEnabled(false);
         pieChart.setExtraOffsets(5, 10, 5, 5);
         pieChart.setDragDecelerationFrictionCoef(0.95f);
         pieChart.setDrawHoleEnabled(true);
-        pieChart.setHoleColor(android.graphics.Color.WHITE);
+        pieChart.setHoleColor(android.R.color.white);
         pieChart.setTransparentCircleRadius(61f);
-        pieChart.setEntryLabelColor(android.graphics.Color.BLACK);
-        pieChart.setEntryLabelTextSize(10f);
+        pieChart.setEntryLabelColor(android.R.color.black);
+        pieChart.setEntryLabelTextSize(12f);
+
+        pieChart.setOnChartValueSelectedListener(new com.github.mikephil.charting.listener.OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, com.github.mikephil.charting.highlight.Highlight h) {
+                PieEntry pe = (PieEntry) e;
+                String category = pe.getLabel();
+                float value = pe.getValue();
+                String unit = pieChart == salesCategoryChart ? "₱" : "items";
+                showCategoryDetailDialog(category, value, unit);
+            }
+
+            @Override
+            public void onNothingSelected() {}
+        });
+    }
+
+    private void showCategoryDetailDialog(String category, float value, String unit) {
+        List<Product> products = db.productDao().getAll(userId);
+        StringBuilder sb = new StringBuilder();
+        sb.append("Details for category: ").append(category).append("\n\n");
+        
+        for (Product p : products) {
+            if (p.category.equals(category)) {
+                sb.append("- ").append(p.name).append(": ")
+                  .append(unit.equals("₱") ? "" : p.stock + " in stock")
+                  .append("\n");
+            }
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("Category: " + category)
+                .setMessage(sb.toString())
+                .setPositiveButton("Close", null)
+                .show();
     }
 
     private void updateDashboardData() {
         List<Sale> allSales = db.saleDao().getAllSales(userId);
         List<Product> allProducts = db.productDao().getAll(userId);
+        List<Expense> allExpenses = db.expenseDao().getAllExpenses(userId);
 
-        double totalExpenses = db.expenseDao().getTotalExpenses(userId);
         double totalRevenue = 0;
-        double todaySales = 0;
+        double todayRevenue = 0;
         int itemsSold = 0;
-        int lowStockCount = 0;
-
         long startOfDay = getStartOfDay();
 
-        for (Sale sale : allSales) {
-            totalRevenue += sale.totalAmount;
-            if (sale.timestamp >= startOfDay) {
-                todaySales += sale.totalAmount;
+        for (Sale s : allSales) {
+            totalRevenue += s.totalAmount;
+            if (s.timestamp >= startOfDay) {
+                todayRevenue += s.totalAmount;
             }
-            // Estimate items sold from summary "Name xQty, ..."
-            String[] parts = sale.itemsSummary.split(",");
+            // Parse summary "Item A x2, Item B x1"
+            String[] parts = s.itemsSummary.split(", ");
             for (String part : parts) {
-                try {
-                    String qtyStr = part.substring(part.lastIndexOf('x') + 1).trim();
-                    itemsSold += Integer.parseInt(qtyStr);
-                } catch (Exception ignored) {}
+                if (part.contains(" x")) {
+                    try {
+                        String q = part.substring(part.lastIndexOf(" x") + 2).trim();
+                        // Remove any trailing commas or spaces that might have been split incorrectly
+                        if (q.endsWith(",")) q = q.substring(0, q.length() - 1);
+                        itemsSold += Integer.parseInt(q);
+                    } catch (Exception ignored) {}
+                }
             }
         }
 
-        for (Product p : allProducts) {
-            if (p.quantity <= p.quantityLimit) {
-                lowStockCount++;
-            }
-        }
+        double totalExpense = 0;
+        for (Expense e : allExpenses) totalExpense += e.amount;
 
-        double netIncome = totalRevenue - totalExpenses;
-
-        tvNetIncome.setText(String.format(Locale.US, "₱%.2f", netIncome));
-        tvTotalRevenue.setText(String.format(Locale.US, "₱%.2f", totalRevenue));
-        tvTotalExpenses.setText(String.format(Locale.US, "₱%.2f", totalExpenses));
-        tvTodaySales.setText(String.format(Locale.US, "₱%.2f", todaySales));
+        tvTotalRevenue.setText(String.format("₱%.2f", totalRevenue));
+        tvTotalExpenses.setText(String.format("₱%.2f", totalExpense));
+        tvNetIncome.setText(String.format("₱%.2f", totalRevenue - totalExpense));
+        tvTodaySales.setText(String.format("₱%.2f", todayRevenue));
         tvTotalProducts.setText(String.valueOf(allProducts.size()));
         tvTotalSalesCount.setText(String.valueOf(allSales.size()));
         tvItemsSold.setText(String.valueOf(itemsSold));
+
+        int lowStockCount = 0;
+        for (Product p : allProducts) {
+            if (p.stock <= p.minStock) lowStockCount++;
+        }
         tvLowStock.setText(String.valueOf(lowStockCount));
 
         updateChartData(allSales);
         updateCategoryCharts(allSales, allProducts);
-        updateNotificationBadge();
     }
 
     private void updateCategoryCharts(List<Sale> sales, List<Product> products) {
         // Sales by Category
-        java.util.Map<String, Double> salesMap = new java.util.HashMap<>();
-        for (Sale sale : sales) {
-            // This is complex because Sale only stores itemsSummary as String
-            // A more robust app would store SaleItems in a separate table
-            String[] parts = sale.itemsSummary.split(",");
+        Map<String, Double> salesByCategory = new HashMap<>();
+        for (Sale s : sales) {
+            String[] parts = s.itemsSummary.split(", ");
             for (String part : parts) {
-                try {
-                    String name = part.substring(0, part.lastIndexOf('x')).trim();
-                    // Find product category by name (Simplified)
+                if (part.contains(" x")) {
+                    String name = part.substring(0, part.lastIndexOf(" x"));
+                    // This is inefficient, ideally Sale stores product IDs or Categories
                     for (Product p : products) {
                         if (p.name.equals(name)) {
-                            salesMap.put(p.category, salesMap.getOrDefault(p.category, 0.0) + p.price);
+                            double amount = p.price * Integer.parseInt(part.substring(part.lastIndexOf(" x") + 2));
+                            salesByCategory.put(p.category, salesByCategory.getOrDefault(p.category, 0.0) + amount);
                             break;
                         }
                     }
-                } catch (Exception ignored) {}
+                }
             }
         }
+        setupPieChart(salesCategoryChart);
+        updatePieChartData(salesCategoryChart, salesByCategory, "Sales by Category");
 
         // Stock by Category
-        java.util.Map<String, Integer> stockMap = new java.util.HashMap<>();
+        Map<String, Integer> stockByCategory = new HashMap<>();
         for (Product p : products) {
-            stockMap.put(p.category, stockMap.getOrDefault(p.category, 0) + p.quantity);
+            stockByCategory.put(p.category, stockByCategory.getOrDefault(p.category, 0) + p.stock);
         }
-
-        updatePieChartData(salesCategoryChart, salesMap, "Sales");
-        updatePieChartDataInteger(stockCategoryChart, stockMap, "Stock");
+        setupPieChart(stockCategoryChart);
+        updatePieChartDataInteger(stockCategoryChart, stockByCategory, "Stock by Category");
     }
 
-    private void updatePieChartData(PieChart chart, java.util.Map<String, Double> dataMap, String label) {
-        if (chart == null || dataMap.isEmpty()) return;
+    private void updatePieChartData(PieChart chart, Map<String, Double> data, String label) {
         List<PieEntry> entries = new ArrayList<>();
-        for (java.util.Map.Entry<String, Double> entry : dataMap.entrySet()) {
+        for (Map.Entry<String, Double> entry : data.entrySet()) {
             entries.add(new PieEntry(entry.getValue().floatValue(), entry.getKey()));
         }
-
         PieDataSet dataSet = new PieDataSet(entries, label);
         dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
-        PieData data = new PieData(dataSet);
-        data.setValueFormatter(new PercentFormatter(chart));
-        data.setValueTextSize(11f);
-        data.setValueTextColor(android.graphics.Color.BLACK);
-        chart.setData(data);
+        PieData pieData = new PieData(dataSet);
+        chart.setData(pieData);
         chart.invalidate();
     }
 
-    private void updatePieChartDataInteger(PieChart chart, java.util.Map<String, Integer> dataMap, String label) {
-        if (chart == null || dataMap.isEmpty()) return;
+    private void updatePieChartDataInteger(PieChart chart, Map<String, Integer> data, String label) {
         List<PieEntry> entries = new ArrayList<>();
-        for (java.util.Map.Entry<String, Integer> entry : dataMap.entrySet()) {
+        for (Map.Entry<String, Integer> entry : data.entrySet()) {
             entries.add(new PieEntry(entry.getValue().floatValue(), entry.getKey()));
         }
-
         PieDataSet dataSet = new PieDataSet(entries, label);
-        dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
-        PieData data = new PieData(dataSet);
-        data.setValueFormatter(new PercentFormatter(chart));
-        data.setValueTextSize(11f);
-        data.setValueTextColor(android.graphics.Color.BLACK);
-        chart.setData(data);
+        dataSet.setColors(ColorTemplate.PASTEL_COLORS);
+        PieData pieData = new PieData(dataSet);
+        chart.setData(pieData);
         chart.invalidate();
     }
 
     private void updateNotificationBadge() {
-        if (tvNotificationBadge == null) return;
-        new Thread(() -> {
-            List<Product> allProducts = db.productDao().getAll(userId);
-            int lowStockCount = 0;
-            for (Product p : allProducts) {
-                if (p.quantity <= p.quantityLimit) {
-                    lowStockCount++;
-                }
-            }
-            int finalLowStockCount = lowStockCount;
-            runOnUiThread(() -> {
-                if (finalLowStockCount > 0) {
-                    tvNotificationBadge.setVisibility(View.VISIBLE);
-                    tvNotificationBadge.setText(String.valueOf(finalLowStockCount));
-                } else {
-                    tvNotificationBadge.setVisibility(View.GONE);
-                }
-            });
-        }).start();
+        List<Product> products = db.productDao().getAll(userId);
+        int lowStockCount = 0;
+        for (Product p : products) {
+            if (p.stock <= p.minStock) lowStockCount++;
+        }
+
+        if (lowStockCount > 0) {
+            tvNotificationBadge.setVisibility(View.VISIBLE);
+            tvNotificationBadge.setText(String.valueOf(lowStockCount));
+        } else {
+            tvNotificationBadge.setVisibility(View.GONE);
+        }
     }
 
     private void showLowStockDialog() {
         new Thread(() -> {
-            List<Product> allProducts = db.productDao().getAll(userId);
+            List<Product> products = db.productDao().getAll(userId);
             List<Product> lowStockItems = new ArrayList<>();
-            for (Product p : allProducts) {
-                if (p.quantity <= p.quantityLimit) {
-                    lowStockItems.add(p);
-                }
+            for (Product p : products) {
+                if (p.stock <= p.minStock) lowStockItems.add(p);
             }
 
             runOnUiThread(() -> {
                 if (lowStockItems.isEmpty()) {
-                    Toast.makeText(this, "No low stock items", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "No low stock products", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                StringBuilder message = new StringBuilder();
-                for (Product p : lowStockItems) {
-                    message.append("• ").append(p.name)
-                            .append(" (Stock: ").append(p.quantity)
-                            .append(", Limit: ").append(p.quantityLimit).append(")\n");
-                }
+                android.view.View dialogView = android.view.LayoutInflater.from(this).inflate(R.layout.dialog_low_stock, null);
+                EditText etSearchLowStock = dialogView.findViewById(R.id.etSearchLowStock);
+                RecyclerView rvLowStock = dialogView.findViewById(R.id.rvLowStock);
+                rvLowStock.setLayoutManager(new LinearLayoutManager(this));
+
+                // Reusing ProductAdapter but with a no-op click listener or custom logic if needed
+                ProductAdapter lowStockAdapter = new ProductAdapter(new ArrayList<>(lowStockItems), product -> {});
+                lowStockAdapter.setLowStockMode(true);
+                rvLowStock.setAdapter(lowStockAdapter);
+
+                etSearchLowStock.addTextChangedListener(new android.text.TextWatcher() {
+                    @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                    @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        List<Product> filtered = new ArrayList<>();
+                        for (Product p : lowStockItems) {
+                            if (p.name.toLowerCase().contains(s.toString().toLowerCase())) {
+                                filtered.add(p);
+                            }
+                        }
+                        lowStockAdapter.updateList(filtered);
+                    }
+                    @Override public void afterTextChanged(android.text.Editable s) {}
+                });
 
                 new AlertDialog.Builder(this)
-                        .setTitle("Low Stock Warning")
-                        .setMessage(message.toString())
-                        .setPositiveButton("Manage Inventory", (dialog, which) -> {
-                            startActivity(new Intent(this, ProductsActivity.class));
-                        })
-                        .setNegativeButton("Close", null)
+                        .setTitle("Low Stock Products")
+                        .setView(dialogView)
+                        .setPositiveButton("Close", null)
                         .show();
             });
         }).start();
     }
 
     private long getStartOfDay() {
-        java.util.Calendar cal = java.util.Calendar.getInstance();
-        cal.set(java.util.Calendar.HOUR_OF_DAY, 0);
-        cal.set(java.util.Calendar.MINUTE, 0);
-        cal.set(java.util.Calendar.SECOND, 0);
-        cal.set(java.util.Calendar.MILLISECOND, 0);
-        return cal.getTimeInMillis();
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis();
     }
 
     private void updateChartData(List<Sale> sales) {
-        if (revenueChart == null) return;
-
         List<Entry> entries = new ArrayList<>();
-        // Group sales by day for the last 7 days (Simplified for now)
-        for (int i = 0; i < sales.size(); i++) {
-            entries.add(new Entry(i, (float) sales.get(i).totalAmount));
+        Map<String, Double> dailySales = new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd", Locale.getDefault());
+
+        // Last 7 days including today
+        List<String> last7Days = new ArrayList<>();
+        for (int i = 6; i >= 0; i--) {
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DAY_OF_YEAR, -i);
+            String date = sdf.format(cal.getTime());
+            last7Days.add(date);
+            dailySales.put(date, 0.0);
         }
 
-        LineDataSet dataSet = new LineDataSet(entries, "Revenue");
+        for (Sale s : sales) {
+            String date = sdf.format(new Date(s.timestamp));
+            if (dailySales.containsKey(date)) {
+                dailySales.put(date, dailySales.get(date) + s.totalAmount);
+            }
+        }
+
+        for (int i = 0; i < last7Days.size(); i++) {
+            entries.add(new Entry(i, dailySales.get(last7Days.get(i)).floatValue()));
+        }
+
+        LineDataSet dataSet = new LineDataSet(entries, "Daily Sales");
         dataSet.setColor(getResources().getColor(R.color.primary_green));
         dataSet.setCircleColor(getResources().getColor(R.color.primary_green));
-        dataSet.setLineWidth(2f);
-        dataSet.setCircleRadius(4f);
+        dataSet.setLineWidth(2.5f);
+        dataSet.setCircleRadius(5f);
+        dataSet.setDrawCircleHole(true);
+        dataSet.setCircleHoleRadius(2.5f);
+        dataSet.setDrawFilled(true);
+        dataSet.setFillAlpha(50);
+        dataSet.setFillColor(getResources().getColor(R.color.primary_green));
+        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         dataSet.setDrawValues(false);
 
-        LineData lineData = new LineData(dataSet);
-        revenueChart.setData(lineData);
+        revenueChart.setData(new LineData(dataSet));
+        revenueChart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                int index = (int) value;
+                if (index >= 0 && index < last7Days.size()) {
+                    return last7Days.get(index);
+                }
+                return "";
+            }
+        });
+        revenueChart.animateY(1000);
         revenueChart.invalidate();
     }
 
@@ -702,297 +809,542 @@ public class POSActivity extends AppCompatActivity implements ProductAdapter.OnA
         List<Expense> allExpenses = db.expenseDao().getAllExpenses(userId);
         List<Product> allProducts = db.productDao().getAll(userId);
 
+        double totalRevenue = 0;
+        for (Sale s : allSales) totalRevenue += s.totalAmount;
+        double totalExpense = 0;
+        for (Expense e : allExpenses) totalExpense += e.amount;
+
+        tvStatsTotalRevenue.setText(String.format("₱%.2f", totalRevenue));
+        tvStatsTotalExpenses.setText(String.format("₱%.2f", totalExpense));
+        tvStatsNetIncome.setText(String.format("₱%.2f", totalRevenue - totalExpense));
+
         updateExpenseRevenueChart(allSales, allExpenses);
         updateTopProductsChart(allSales, allProducts);
     }
 
     private void updateExpenseRevenueChart(List<Sale> sales, List<Expense> expenses) {
-        if (expenseRevenueChart == null) return;
+        Map<String, Double> dailyRevenue = new HashMap<>();
+        Map<String, Double> dailyExpense = new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd", Locale.getDefault());
 
-        // Group by day for the last 20 days
-        java.util.Map<String, Double> revenueMap = new java.util.TreeMap<>();
-        java.util.Map<String, Double> expenseMap = new java.util.TreeMap<>();
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MM/dd", Locale.US);
+        // Last 15 days
+        List<String> dates = new ArrayList<>();
+        for (int i = 14; i >= 0; i--) {
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DAY_OF_YEAR, -i);
+            String date = sdf.format(cal.getTime());
+            dates.add(date);
+            dailyRevenue.put(date, 0.0);
+            dailyExpense.put(date, 0.0);
+        }
 
-        long twentyDaysAgo = System.currentTimeMillis() - (20 * 24 * 60 * 60 * 1000L);
-
-        double totalRevenue = 0;
-        double totalExpenses = 0;
-
-        for (Sale sale : sales) {
-            if (sale.timestamp >= twentyDaysAgo) {
-                String day = sdf.format(new java.util.Date(sale.timestamp));
-                double amount = sale.totalAmount;
-                revenueMap.put(day, revenueMap.getOrDefault(day, 0.0) + amount);
-                totalRevenue += amount;
+        for (Sale s : sales) {
+            String date = sdf.format(new Date(s.timestamp));
+            if (dailyRevenue.containsKey(date)) {
+                dailyRevenue.put(date, dailyRevenue.get(date) + s.totalAmount);
+            }
+        }
+        for (Expense e : expenses) {
+            String date = sdf.format(new Date(e.timestamp));
+            if (dailyExpense.containsKey(date)) {
+                dailyExpense.put(date, dailyExpense.get(date) + e.amount);
             }
         }
 
-        for (Expense expense : expenses) {
-            if (expense.timestamp >= twentyDaysAgo) {
-                String day = sdf.format(new java.util.Date(expense.timestamp));
-                double amount = expense.amount;
-                expenseMap.put(day, expenseMap.getOrDefault(day, 0.0) + amount);
-                totalExpenses += amount;
-            }
+        List<Entry> revEntries = new ArrayList<>();
+        List<Entry> expEntries = new ArrayList<>();
+        for (int i = 0; i < dates.size(); i++) {
+            revEntries.add(new Entry(i, dailyRevenue.get(dates.get(i)).floatValue()));
+            expEntries.add(new Entry(i, dailyExpense.get(dates.get(i)).floatValue()));
         }
 
-        if (tvStatsTotalRevenue != null) tvStatsTotalRevenue.setText(String.format(Locale.US, "₱%.2f", totalRevenue));
-        if (tvStatsTotalExpenses != null) tvStatsTotalExpenses.setText(String.format(Locale.US, "₱%.2f", totalExpenses));
-        if (tvStatsNetIncome != null) tvStatsNetIncome.setText(String.format(Locale.US, "₱%.2f", totalRevenue - totalExpenses));
-
-        List<Entry> revenueEntries = new ArrayList<>();
-        List<Entry> expenseEntries = new ArrayList<>();
-        List<String> labels = new ArrayList<>();
-
-        int i = 0;
-        // Ensure all days are represented
-        for (long t = twentyDaysAgo; t <= System.currentTimeMillis(); t += 24 * 60 * 60 * 1000L) {
-            String day = sdf.format(new java.util.Date(t));
-            labels.add(day);
-            revenueEntries.add(new Entry(i, revenueMap.getOrDefault(day, 0.0).floatValue()));
-            expenseEntries.add(new Entry(i, expenseMap.getOrDefault(day, 0.0).floatValue()));
-            i++;
-        }
-
-        LineDataSet revSet = new LineDataSet(revenueEntries, "Revenue");
-        revSet.setColor(android.graphics.Color.parseColor("#4CAF50")); // Green
-        revSet.setCircleColor(android.graphics.Color.parseColor("#4CAF50"));
+        LineDataSet revSet = new LineDataSet(revEntries, "Revenue");
+        revSet.setColor(getResources().getColor(R.color.primary_green));
+        revSet.setCircleColor(getResources().getColor(R.color.primary_green));
         revSet.setLineWidth(2f);
-        revSet.setCircleRadius(3f);
-        revSet.setDrawValues(false);
+        revSet.setDrawFilled(true);
+        revSet.setFillAlpha(30);
+        revSet.setFillColor(getResources().getColor(R.color.primary_green));
 
-        LineDataSet expSet = new LineDataSet(expenseEntries, "Expenses");
-        expSet.setColor(android.graphics.Color.parseColor("#F44336")); // Red
-        expSet.setCircleColor(android.graphics.Color.parseColor("#F44336"));
+        LineDataSet expSet = new LineDataSet(expEntries, "Expenses");
+        expSet.setColor(0xFFF44336); // Red
+        expSet.setCircleColor(0xFFF44336);
         expSet.setLineWidth(2f);
-        expSet.setCircleRadius(3f);
-        expSet.setDrawValues(false);
+        expSet.setDrawFilled(true);
+        expSet.setFillAlpha(30);
+        expSet.setFillColor(0xFFF44336);
 
         LineData data = new LineData(revSet, expSet);
         expenseRevenueChart.setData(data);
-        
         expenseRevenueChart.getXAxis().setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
                 int index = (int) value;
-                if (index >= 0 && index < labels.size()) return labels.get(index);
+                if (index >= 0 && index < dates.size()) {
+                    return dates.get(index);
+                }
                 return "";
             }
         });
-        expenseRevenueChart.getXAxis().setGranularity(1f);
+        expenseRevenueChart.animateX(1000);
         expenseRevenueChart.invalidate();
     }
 
     private void updateTopProductsChart(List<Sale> sales, List<Product> products) {
-        if (topProductsChart == null) return;
-
-        java.util.Map<String, Integer> unitsMap = new java.util.HashMap<>();
-        java.util.Map<String, Double> revenueMap = new java.util.HashMap<>();
-
-        for (Sale sale : sales) {
-            String[] parts = sale.itemsSummary.split(",");
+        Map<String, Integer> productQty = new HashMap<>();
+        for (Sale s : sales) {
+            String[] parts = s.itemsSummary.split(", ");
             for (String part : parts) {
-                try {
-                    int xIndex = part.lastIndexOf('x');
-                    if (xIndex == -1) continue;
-                    String name = part.substring(0, xIndex).trim();
-                    String qtyStr = part.substring(xIndex + 1).trim();
-                    int qty = Integer.parseInt(qtyStr);
-                    
-                    unitsMap.put(name, unitsMap.getOrDefault(name, 0) + qty);
-                    
-                    // Find price
-                    double price = 0;
-                    for (Product p : products) {
-                        if (p.name.equals(name)) {
-                            price = p.price;
-                            break;
-                        }
-                    }
-                    revenueMap.put(name, revenueMap.getOrDefault(name, 0.0) + (price * qty));
-                } catch (Exception ignored) {}
+                if (part.contains(" x")) {
+                    try {
+                        String name = part.substring(0, part.lastIndexOf(" x")).trim();
+                        String qtyStr = part.substring(part.lastIndexOf(" x") + 2).trim();
+                        if (qtyStr.endsWith(",")) qtyStr = qtyStr.substring(0, qtyStr.length() - 1);
+                        int qty = Integer.parseInt(qtyStr);
+                        productQty.put(name, productQty.getOrDefault(name, 0) + qty);
+                    } catch (Exception ignored) {}
+                }
             }
         }
 
-        // Sort by units sold and take top 10
-        List<java.util.Map.Entry<String, Integer>> sortedList = new ArrayList<>(unitsMap.entrySet());
-        sortedList.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
-        if (sortedList.size() > 10) sortedList = sortedList.subList(0, 10);
+        List<Map.Entry<String, Integer>> list = new ArrayList<>(productQty.entrySet());
+        list.sort((a, b) -> b.getValue().compareTo(a.getValue()));
 
         List<BarEntry> entries = new ArrayList<>();
         List<String> labels = new ArrayList<>();
-
-        for (int i = 0; i < sortedList.size(); i++) {
-            String name = sortedList.get(i).getKey();
-            float units = sortedList.get(i).getValue().floatValue();
-            float revenue = revenueMap.getOrDefault(name, 0.0).floatValue();
-            // Stacked bar: Units and Revenue (Note: different scales might look weird, maybe better as grouped or just one)
-            // But user asked for both. Let's use revenue as it's usually more important for "Top Sold"
-            entries.add(new BarEntry(i, new float[]{units, revenue}));
-            labels.add(name);
+        int count = Math.min(5, list.size());
+        for (int i = 0; i < count; i++) {
+            entries.add(new BarEntry(i, list.get(i).getValue()));
+            labels.add(list.get(i).getKey());
         }
 
-        BarDataSet dataSet = new BarDataSet(entries, "Units & Revenue");
-        dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
-        dataSet.setStackLabels(new String[]{"Units Sold", "Revenue (₱)"});
-
+        BarDataSet dataSet = new BarDataSet(entries, "Top 5 Products");
+        dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
         BarData data = new BarData(dataSet);
         topProductsChart.setData(data);
         topProductsChart.getXAxis().setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
                 int index = (int) value;
-                if (index >= 0 && index < labels.size()) return labels.get(index);
+                if (index >= 0 && index < labels.size()) {
+                    return labels.get(index);
+                }
                 return "";
             }
         });
         topProductsChart.invalidate();
     }
 
-    private void switchContent(View viewToShow, String title) {
-        if (viewToShow.getVisibility() == View.VISIBLE) return;
+    private void switchContent(View view, String title) {
+        if (view == null) return;
 
-        View[] allViews = {cashierContent, dashboardContent, reportsContent, salesHistoryContent, cartContent, statisticsContent};
-        
-        for (View v : allViews) {
-            if (v.getVisibility() == View.VISIBLE) {
-                v.setVisibility(View.GONE);
-            }
-        }
+        if (cashierContent != null) cashierContent.setVisibility(View.GONE);
+        if (dashboardContent != null) dashboardContent.setVisibility(View.GONE);
+        if (reportsContent != null) reportsContent.setVisibility(View.GONE);
+        if (salesHistoryContent != null) salesHistoryContent.setVisibility(View.GONE);
+        if (cartContent != null) cartContent.setVisibility(View.GONE);
+        if (statisticsContent != null) statisticsContent.setVisibility(View.GONE);
+        if (reservations_content != null) reservations_content.setVisibility(View.GONE);
+        if (debts_content != null) debts_content.setVisibility(View.GONE);
+        if (settingsContent != null) settingsContent.setVisibility(View.GONE);
 
-        viewToShow.setVisibility(View.VISIBLE);
-        Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
-        viewToShow.startAnimation(fadeIn);
-
+        view.setVisibility(View.VISIBLE);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(title);
-            if (viewToShow == cartContent) {
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                if (toolbar.getNavigationIcon() != null) {
-                    toolbar.getNavigationIcon().setTint(getResources().getColor(R.color.white));
-                }
-                toolbar.setNavigationOnClickListener(v -> switchContent(cashierContent, "Cashier"));
-            } else {
-                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                        this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-                drawerLayout.addDrawerListener(toggle);
-                toggle.syncState();
-            }
+        }
+
+        if (view == cashierContent) {
+            if (btnViewCart != null) btnViewCart.setVisibility(View.VISIBLE);
+        } else {
+            if (btnViewCart != null) btnViewCart.setVisibility(View.GONE);
         }
     }
 
     private void updateCheckoutButton() {
-        btnCheckout.setText(String.format(Locale.US, "Checkout (₱%.2f)", totalAmount));
+        String text = String.format("Checkout (₱%.2f)", totalAmount);
+        btnCheckout.setText(text);
+        if (btnCheckout2 != null) btnCheckout2.setText(text);
     }
 
     private void showSalesHistoryPage() {
         switchContent(salesHistoryContent, "Sales History");
-        
         List<Sale> sales = db.saleDao().getAllSales(userId);
-        if (saleAdapter == null) {
-            saleAdapter = new SaleAdapter(sales);
-            rvSalesHistory.setAdapter(saleAdapter);
-        } else {
-            saleAdapter.updateList(sales);
-        }
+        saleAdapter.updateList(sales);
+    }
+
+    private void refreshProductList() {
+        List<Product> products = db.productDao().getAll(userId);
+        adapter.updateList(products);
+        notifyAdapters();
+    }
+
+    private void exportProductsToExcel() {
+        createDocumentLauncher.launch("Products_Export.xlsx");
     }
 
     private void showLogoutDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("Logout")
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setMessage("Do you want to logout?")
-                .setPositiveButton("Yes", (dialog, which) -> {
-                    Intent intent = new Intent(this, LoginActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
+                .setMessage("Are you sure you want to logout?")
+                .setPositiveButton("Logout", (dialog, which) -> {
                     finish();
                 })
-                .setNegativeButton("No", null)
+                .setNegativeButton("Cancel", null)
                 .show();
     }
 
-    private void showSalesHistoryDialog() {
-        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_sales_history, null);
-        RecyclerView rvSales = dialogView.findViewById(R.id.rvSales);
-        rvSales.setLayoutManager(new LinearLayoutManager(this));
-
-        List<Sale> sales = db.saleDao().getAllSales(userId);
-        SaleAdapter saleAdapter = new SaleAdapter(sales);
-        rvSales.setAdapter(saleAdapter);
-
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setView(dialogView)
-                .create();
-
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        }
-
-        dialogView.findViewById(R.id.btnClose).setOnClickListener(v -> dialog.dismiss());
-        dialog.show();
-
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setLayout(
-                (int) (getResources().getDisplayMetrics().widthPixels * 0.95),
-                (int) (getResources().getDisplayMetrics().heightPixels * 0.8)
-            );
-        }
+    private void showReservationsPage() {
+        switchContent(reservations_content, "Reservations");
+        refreshReservations();
     }
 
-    private void exportProductsToExcel() {
-        createDocumentLauncher.launch("Products_Report_" + System.currentTimeMillis() + ".xlsx");
+    private void showDebtsPage() {
+        switchContent(debts_content, "Debts");
+        refreshDebts();
     }
 
-    private void saveExcelToUri(android.net.Uri uri) {
-        new Thread(() -> {
-            List<Product> products = db.productDao().getAll(userId);
-            try (Workbook workbook = new XSSFWorkbook();
-                 OutputStream outputStream = getContentResolver().openOutputStream(uri)) {
-                
-                Sheet sheet = workbook.createSheet("Products");
+    private void setupDebtAdapter() {
+        debtAdapter = new DebtAdapter(debts, new DebtAdapter.OnDebtActionListener() {
+            @Override
+            public void onPay(Debt debt) {
+                new AlertDialog.Builder(POSActivity.this)
+                        .setTitle("Mark as Paid")
+                        .setMessage("Has this debt of ₱" + String.format("%.2f", debt.amount) + " for " + debt.quantity + "x " + debt.productName + " been fully paid?")
+                        .setPositiveButton("Yes", (dialog, which) -> {
+                            // Record a sale when paid
+                            String summary = debt.productName + " (Debt Payment) x" + debt.quantity;
+                            Sale sale = new Sale(debt.amount, debt.amount, 0, System.currentTimeMillis(), summary, userId);
+                            long saleId = db.saleDao().insert(sale);
 
-                // Create header row
-                Row headerRow = sheet.createRow(0);
-                headerRow.createCell(0).setCellValue("ID");
-                headerRow.createCell(1).setCellValue("Name");
-                headerRow.createCell(2).setCellValue("Category");
-                headerRow.createCell(3).setCellValue("Cost");
-                headerRow.createCell(4).setCellValue("Price");
-                headerRow.createCell(5).setCellValue("Quantity");
-                headerRow.createCell(6).setCellValue("Stock Limit");
+                            debt.status = "Paid";
+                            debt.associatedSaleId = (int) saleId;
+                            db.debtDao().update(debt);
 
-                // Fill data
-                int rowNum = 1;
-                for (Product product : products) {
-                    Row row = sheet.createRow(rowNum++);
-                    row.createCell(0).setCellValue(product.id);
-                    row.createCell(1).setCellValue(product.name);
-                    row.createCell(2).setCellValue(product.category);
-                    row.createCell(3).setCellValue(product.cost);
-                    row.createCell(4).setCellValue(product.price);
-                    row.createCell(5).setCellValue(product.quantity);
-                    row.createCell(6).setCellValue(product.quantityLimit);
-                }
-
-                workbook.write(outputStream);
-                
-                runOnUiThread(() -> Toast.makeText(this, "Excel report saved successfully", Toast.LENGTH_SHORT).show());
-            } catch (Exception e) {
-                e.printStackTrace();
-                runOnUiThread(() -> Toast.makeText(this, "Error saving Excel: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                            refreshDebts();
+                            Toast.makeText(POSActivity.this, "Debt marked as paid and recorded in history", Toast.LENGTH_SHORT).show();
+                        })
+                        .setNegativeButton("No", null)
+                        .show();
             }
-        }).start();
+
+            @Override
+            public void onUndo(Debt debt) {
+                new AlertDialog.Builder(POSActivity.this)
+                        .setTitle("Undo Payment")
+                        .setMessage("Revert this debt to Unpaid? The associated sale record will be deleted.")
+                        .setPositiveButton("Yes", (dialog, which) -> {
+                            if (debt.associatedSaleId != -1) {
+                                db.saleDao().deleteById(debt.associatedSaleId);
+                            }
+                            debt.status = "Unpaid";
+                            debt.associatedSaleId = -1;
+                            db.debtDao().update(debt);
+                            refreshDebts();
+                            Toast.makeText(POSActivity.this, "Payment undone", Toast.LENGTH_SHORT).show();
+                        })
+                        .setNegativeButton("No", null)
+                        .show();
+            }
+
+            @Override
+            public void onDelete(Debt debt) {
+                new AlertDialog.Builder(POSActivity.this)
+                        .setTitle("Delete Debt Record")
+                        .setMessage("Are you sure you want to delete this debt record?")
+                        .setPositiveButton("Delete", (dialog, which) -> {
+                            db.debtDao().delete(debt);
+                            refreshDebts();
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            }
+        });
+        rvDebts.setAdapter(debtAdapter);
     }
 
-    @Override
-    public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
+    private void refreshDebts() {
+        debts = db.debtDao().getAllDebts(userId);
+        if (debtAdapter != null) {
+            debtAdapter.setDebts(debts);
+        }
+    }
+
+    private void showAddDebtDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.dialog_add_debt, null);
+
+        EditText etName = view.findViewById(R.id.etDebtCustomerName);
+        Spinner spinnerProduct = view.findViewById(R.id.spinnerDebtProduct);
+        EditText etQuantity = view.findViewById(R.id.etDebtQuantity);
+        EditText etAmount = view.findViewById(R.id.etDebtAmount);
+        EditText etNote = view.findViewById(R.id.etDebtNote);
+
+        List<Product> productList = db.productDao().getAll(userId);
+        List<String> productNames = new ArrayList<>();
+        for (Product p : productList) {
+            productNames.add(p.name + " (₱" + p.price + ", Stock: " + p.stock + ")");
+        }
+
+        ArrayAdapter<String> productAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, productNames);
+        productAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerProduct.setAdapter(productAdapter);
+
+        spinnerProduct.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Product selected = productList.get(position);
+                etAmount.setText(String.valueOf(selected.price));
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        builder.setView(view)
+                .setTitle("Add New Debt")
+                .setPositiveButton("Save", (dialog, which) -> {
+                    String name = etName.getText().toString();
+                    String qtyStr = etQuantity.getText().toString();
+                    String amountStr = etAmount.getText().toString();
+                    String note = etNote.getText().toString();
+
+                    if (name.isEmpty() || qtyStr.isEmpty() || amountStr.isEmpty() || productList.isEmpty()) {
+                        Toast.makeText(this, "Please fill all required fields", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    int quantity = Integer.parseInt(qtyStr);
+                    double amount = Double.parseDouble(amountStr) * quantity;
+                    Product selectedProduct = productList.get(spinnerProduct.getSelectedItemPosition());
+
+                    if (selectedProduct.stock < quantity) {
+                        Toast.makeText(this, "Insufficient stock", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Deduct stock immediately when loaning
+                    selectedProduct.stock -= quantity;
+                    db.productDao().update(selectedProduct);
+
+                    Debt debt = new Debt(name, selectedProduct.name, quantity, amount, System.currentTimeMillis(), "Unpaid", note, userId);
+                    db.debtDao().insert(debt);
+                    refreshDebts();
+                    refreshProductList();
+                    Toast.makeText(this, "Debt recorded and stock updated", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void setupReservationAdapter() {
+        reservationAdapter = new ReservationAdapter(reservations, new ReservationAdapter.OnReservationActionListener() {
+            @Override
+            public void onComplete(Reservation reservation) {
+                new AlertDialog.Builder(POSActivity.this)
+                        .setTitle("Complete Reservation")
+                        .setMessage("Do you want to complete this reservation and record a sale?")
+                        .setPositiveButton("Complete", (dialog, which) -> {
+                            // Record a sale
+                            Sale sale = new Sale(reservation.totalAmount, reservation.totalAmount, 0, System.currentTimeMillis(), reservation.itemsSummary, userId);
+                            long saleId = db.saleDao().insert(sale);
+
+                            reservation.status = "Completed";
+                            reservation.associatedSaleId = (int) saleId;
+                            db.reservationDao().update(reservation);
+                            refreshReservations();
+                            Toast.makeText(POSActivity.this, "Reservation completed and sale recorded", Toast.LENGTH_SHORT).show();
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            }
+
+            @Override
+            public void onCancel(Reservation reservation) {
+                new AlertDialog.Builder(POSActivity.this)
+                        .setTitle("Cancel Reservation")
+                        .setMessage("Are you sure you want to cancel this reservation? Stock will be restored.")
+                        .setPositiveButton("Yes", (dialog, which) -> {
+                            // Restore stock
+                            String[] parts = reservation.itemsSummary.split(", ");
+                            for (String part : parts) {
+                                if (part.isEmpty()) continue;
+                                try {
+                                    int xIndex = part.lastIndexOf(" x");
+                                    String name = part.substring(0, xIndex);
+                                    int qty = Integer.parseInt(part.substring(xIndex + 2));
+                                    Product p = db.productDao().getProductByName(name, userId);
+                                    if (p != null) {
+                                        p.stock += qty;
+                                        db.productDao().update(p);
+                                    }
+                                } catch (Exception e) {
+                                    Log.e("POSActivity", "Error restoring stock: " + e.getMessage());
+                                }
+                            }
+                            reservation.status = "Cancelled";
+                            db.reservationDao().update(reservation);
+                            refreshReservations();
+                            refreshProductList();
+                            Toast.makeText(POSActivity.this, "Reservation cancelled and stock restored", Toast.LENGTH_SHORT).show();
+                        })
+                        .setNegativeButton("No", null)
+                        .show();
+            }
+
+            @Override
+            public void onUndo(Reservation reservation) {
+                new AlertDialog.Builder(POSActivity.this)
+                        .setTitle("Undo Status")
+                        .setMessage("Revert this reservation to Pending? (If it was completed, the sale record will be deleted; if it was cancelled, stock will be re-deducted)")
+                        .setPositiveButton("Yes", (dialog, which) -> {
+                            if ("Completed".equalsIgnoreCase(reservation.status)) {
+                                if (reservation.associatedSaleId != null && reservation.associatedSaleId != -1) {
+                                    db.saleDao().deleteById(reservation.associatedSaleId);
+                                    reservation.associatedSaleId = -1;
+                                }
+                            } else if ("Cancelled".equalsIgnoreCase(reservation.status)) {
+                                // Re-deduct stock
+                                String[] parts = reservation.itemsSummary.split(", ");
+                                for (String part : parts) {
+                                    if (part.isEmpty()) continue;
+                                    try {
+                                        int xIndex = part.lastIndexOf(" x");
+                                        String name = part.substring(0, xIndex);
+                                        int qty = Integer.parseInt(part.substring(xIndex + 2));
+                                        Product p = db.productDao().getProductByName(name, userId);
+                                        if (p != null) {
+                                            p.stock -= qty;
+                                            db.productDao().update(p);
+                                        }
+                                    } catch (Exception e) {
+                                        Log.e("POSActivity", "Error re-deducting stock: " + e.getMessage());
+                                    }
+                                }
+                            }
+                            reservation.status = "Pending";
+                            db.reservationDao().update(reservation);
+                            refreshReservations();
+                            refreshProductList();
+                            Toast.makeText(POSActivity.this, "Reservation reverted to Pending", Toast.LENGTH_SHORT).show();
+                        })
+                        .setNegativeButton("No", null)
+                        .show();
+            }
+        });
+        rvReservations.setAdapter(reservationAdapter);
+    }
+
+    private void refreshReservations() {
+        reservations = db.reservationDao().getAllReservations(userId);
+        if (reservationAdapter != null) {
+            reservationAdapter.setReservations(reservations);
+        }
+    }
+
+    private void showAddReservationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.dialog_add_reservation, null);
+
+        EditText etCustomerName = view.findViewById(R.id.etResCustomerName);
+        EditText etContact = view.findViewById(R.id.etResContact);
+        Spinner spinnerProduct = view.findViewById(R.id.spinnerResProduct);
+        EditText etQuantity = view.findViewById(R.id.etResQuantity);
+        TextView tvSummary = view.findViewById(R.id.tvResSummary);
+        Button btnAdd = view.findViewById(R.id.btnResAddItem);
+
+        List<Product> productList = db.productDao().getAll(userId);
+        List<String> productNames = new ArrayList<>();
+        for (Product p : productList) productNames.add(p.name + " (Stock: " + p.stock + ")");
+
+        ArrayAdapter<String> productAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, productNames);
+        spinnerProduct.setAdapter(productAdapter);
+
+        final List<CartItem> resItems = new ArrayList<>();
+        final double[] resTotal = {0};
+
+        btnAdd.setOnClickListener(v -> {
+            if (productList.isEmpty()) return;
+            Product p = productList.get(spinnerProduct.getSelectedItemPosition());
+            String qtyStr = etQuantity.getText().toString();
+            if (qtyStr.isEmpty()) return;
+            int qty = Integer.parseInt(qtyStr);
+
+            if (qty > p.stock) {
+                Toast.makeText(this, "Not enough stock", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            resItems.add(new CartItem(p, qty));
+            resTotal[0] += p.price * qty;
+            
+            StringBuilder sb = new StringBuilder();
+            for (CartItem item : resItems) {
+                sb.append(item.product.name).append(" x").append(item.quantity).append("\n");
+            }
+            sb.append("Total: ₱").append(String.format("%.2f", resTotal[0]));
+            tvSummary.setText(sb.toString());
+        });
+
+        builder.setView(view)
+                .setTitle("Add Reservation")
+                .setPositiveButton("Save", (dialog, which) -> {
+                    String name = etCustomerName.getText().toString();
+                    if (name.isEmpty() || resItems.isEmpty()) {
+                        Toast.makeText(this, "Name and items are required", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    StringBuilder summary = new StringBuilder();
+                    for (CartItem item : resItems) {
+                        summary.append(item.product.name).append(" x").append(item.quantity).append(", ");
+                        
+                        // Deduct stock for reservation
+                        item.product.stock -= item.quantity;
+                        db.productDao().update(item.product);
+                    }
+
+                    Reservation res = new Reservation(name, etContact.getText().toString(), 
+                        summary.toString(), resTotal[0], System.currentTimeMillis(), "Pending", userId);
+                    db.reservationDao().insert(res);
+                    refreshReservations();
+                    refreshProductList();
+                    Toast.makeText(this, "Reservation added", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void saveExcelToUri(Uri uri) {
+        try (OutputStream outputStream = getContentResolver().openOutputStream(uri);
+             Workbook workbook = new XSSFWorkbook()) {
+
+            Sheet sheet = workbook.createSheet("Products");
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("ID");
+            headerRow.createCell(1).setCellValue("Name");
+            headerRow.createCell(2).setCellValue("Category");
+            headerRow.createCell(3).setCellValue("Price");
+            headerRow.createCell(4).setCellValue("Stock");
+            headerRow.createCell(5).setCellValue("Min Stock");
+
+            List<Product> products = db.productDao().getAll(userId);
+            int rowNum = 1;
+            for (Product p : products) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(p.id);
+                row.createCell(1).setCellValue(p.name);
+                row.createCell(2).setCellValue(p.category);
+                row.createCell(3).setCellValue(p.price);
+                row.createCell(4).setCellValue(p.stock);
+                row.createCell(5).setCellValue(p.minStock);
+            }
+
+            workbook.write(outputStream);
+            Toast.makeText(this, "Exported successfully", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Log.e("POSActivity", "Error exporting Excel", e);
+            Toast.makeText(this, "Export failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 }

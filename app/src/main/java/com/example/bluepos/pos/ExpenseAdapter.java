@@ -14,10 +14,21 @@ import java.util.Locale;
 
 public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder> {
 
+    public interface OnExpenseActionListener {
+        void onEdit(Expense expense);
+        void onDelete(Expense expense);
+    }
+
     private List<Expense> expenses;
+    private OnExpenseActionListener listener;
 
     public ExpenseAdapter(List<Expense> expenses) {
         this.expenses = expenses;
+    }
+
+    public ExpenseAdapter(List<Expense> expenses, OnExpenseActionListener listener) {
+        this.expenses = expenses;
+        this.listener = listener;
     }
 
     public void updateList(List<Expense> newList) {
@@ -40,6 +51,14 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
         
         SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault());
         holder.tvDate.setText(sdf.format(new Date(expense.timestamp)));
+
+        holder.btnEdit.setOnClickListener(v -> {
+            if (listener != null) listener.onEdit(expense);
+        });
+
+        holder.btnDelete.setOnClickListener(v -> {
+            if (listener != null) listener.onDelete(expense);
+        });
     }
 
     @Override
@@ -49,12 +68,15 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
 
     static class ExpenseViewHolder extends RecyclerView.ViewHolder {
         TextView tvTitle, tvAmount, tvDate;
+        View btnEdit, btnDelete;
 
         public ExpenseViewHolder(@NonNull View itemView) {
             super(itemView);
             tvTitle = itemView.findViewById(R.id.tvExpenseTitle);
             tvAmount = itemView.findViewById(R.id.tvExpenseAmount);
             tvDate = itemView.findViewById(R.id.tvExpenseDate);
+            btnEdit = itemView.findViewById(R.id.btnEditExpense);
+            btnDelete = itemView.findViewById(R.id.btnDeleteExpense);
         }
     }
 }

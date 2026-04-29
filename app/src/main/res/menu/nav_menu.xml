@@ -6,32 +6,32 @@
         android:title="Dashboard" />
     <item
         android:id="@+id/nav_pos"
-        android:icon="@android:drawable/ic_menu_edit"
-        android:title="POS Counter" />
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:title="POS / Cashier" />
     <item
         android:id="@+id/nav_products"
-        android:icon="@android:drawable/ic_menu_gallery"
-        android:title="Inventory" />
+        android:icon="@android:drawable/ic_menu_my_calendar"
+        android:title="@string/inventory_title" />
     <item
         android:id="@+id/nav_sales_history"
         android:icon="@android:drawable/ic_menu_recent_history"
         android:title="Sales History" />
     <item
         android:id="@+id/nav_reservations"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:title="Reservations" />
+    <item
+        android:id="@+id/nav_debts"
         android:icon="@android:drawable/ic_menu_my_calendar"
-        android:title="Product Reservations" />
-    <item
-        android:id="@+id/nav_cashier"
-        android:icon="@android:drawable/ic_menu_agenda"
-        android:title="Cashier" />
-    <item
-        android:id="@+id/nav_reports"
-        android:icon="@android:drawable/ic_menu_sort_by_size"
-        android:title="Reports" />
+        android:title="Debts" />
     <item
         android:id="@+id/nav_statistics"
         android:icon="@android:drawable/ic_menu_compass"
         android:title="Statistics" />
+    <item
+        android:id="@+id/nav_reports"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:title="Reports" />
     <item
         android:id="@+id/nav_settings"
         android:icon="@android:drawable/ic_menu_preferences"

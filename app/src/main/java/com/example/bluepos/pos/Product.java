@@ -11,18 +11,22 @@ public class Product {
     public String name;
     public double cost;
     public double price;
-    public int quantity;
-    public int quantityLimit;
+    public int stock;
+    public int minStock;
     public String category;
     public int userId;
+    public boolean hasExpiration;
+    public Long expirationDate;
 
-    public Product(String name, double cost, double price, int quantity, int quantityLimit, String category, int userId) {
+    public Product(String name, double cost, double price, int stock, int minStock, String category, int userId, boolean hasExpiration, Long expirationDate) {
         this.name = name;
         this.cost = cost;
         this.price = price;
-        this.quantity = quantity;
-        this.quantityLimit = quantityLimit;
+        this.stock = stock;
+        this.minStock = minStock;
         this.category = category;
         this.userId = userId;
+        this.hasExpiration = hasExpiration;
+        this.expirationDate = expirationDate;
     }
 }

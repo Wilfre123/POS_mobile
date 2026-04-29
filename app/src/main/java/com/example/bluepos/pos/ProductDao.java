@@ -24,4 +24,19 @@ public interface ProductDao {
 
     @Delete
     void delete(Product product);
+
+    @Query("SELECT * FROM products WHERE id = :productId")
+    Product getById(int productId);
+
+    @Query("SELECT DISTINCT category FROM products WHERE userId = :userId")
+    List<String> getUniqueCategories(int userId);
+
+    @Query("UPDATE products SET userId = :userId")
+    void updateUserIdForAll(int userId);
+
+    @Query("DELETE FROM products WHERE userId = :userId")
+    void deleteAllByUserId(int userId);
+
+    @Query("SELECT * FROM products WHERE name = :name AND userId = :userId LIMIT 1")
+    Product getProductByName(String name, int userId);
 }

@@ -43,6 +43,8 @@
             android:drawableStart="@android:drawable/ic_menu_search"
             android:drawablePadding="8dp"
             android:hint="Search in cart..."
+            android:textColor="@color/black"
+            android:textColorHint="@color/gray_text"
             android:paddingHorizontal="12dp"
             android:textSize="14sp"
             app:layout_constraintTop_toBottomOf="@id/tvHeader" />

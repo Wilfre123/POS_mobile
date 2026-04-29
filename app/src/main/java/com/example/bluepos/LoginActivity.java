@@ -20,7 +20,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        db = AppDatabase.getInstance(this);
+        db = AppDatabase.getDatabase(this);
 
         EditText etEmail = findViewById(R.id.etEmail);
         EditText etPassword = findViewById(R.id.etPassword);
@@ -39,6 +39,7 @@ public class LoginActivity extends AppCompatActivity {
                     prefs.edit()
                         .putInt("userId", user.id)
                         .putString("username", user.name)
+                        .putString("userEmail", user.email)
                         .apply();
 
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));

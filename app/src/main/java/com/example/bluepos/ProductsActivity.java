@@ -5,9 +5,12 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -19,13 +22,14 @@ import com.example.bluepos.pos.ExpenseAdapter;
 import com.example.bluepos.pos.Product;
 import com.example.bluepos.pos.ProductManageAdapter;
 import com.example.bluepos.pos.Sale;
+import com.example.bluepos.pos.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class ProductsActivity extends AppCompatActivity implements ProductManageAdapter.OnProductActionListener {
+public class ProductsActivity extends AppCompatActivity implements ProductManageAdapter.OnProductActionListener, ExpenseAdapter.OnExpenseActionListener {
 
     private AppDatabase db;
     private ProductManageAdapter adapter;
@@ -35,17 +39,20 @@ public class ProductsActivity extends AppCompatActivity implements ProductManage
     private boolean isAuthorized = false;
     private int userId;
 
-    private View productsSection, expensesSection;
+    private View productsSection, expensesSection, historySection;
+    private View cardAddExpense, cardOverview;
     private EditText etExpenseTitle, etExpenseAmount;
     private TextView tvExpToday, tvExpTotal, tvExpRevenue, tvExpNet;
     private android.widget.Button btnAddExpense;
+    private android.widget.AutoCompleteTextView autoCompleteCategory;
+    private String selectedCategory = "All Categories";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_products);
 
-        db = AppDatabase.getInstance(this);
+        db = AppDatabase.getDatabase(this);
 
         android.content.SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         userId = prefs.getInt("userId", -1);
@@ -58,7 +65,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductManage
                 toolbar.getNavigationIcon().setTint(getResources().getColor(android.R.color.white));
             }
         }
-        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        toolbar.setNavigationOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
         rvProducts = findViewById(R.id.rvProducts);
         searchView = findViewById(R.id.searchView);
@@ -66,16 +73,21 @@ public class ProductsActivity extends AppCompatActivity implements ProductManage
 
         productsSection = findViewById(R.id.products_section);
         expensesSection = findViewById(R.id.expenses_section);
+        historySection = findViewById(R.id.history_section);
+        cardAddExpense = findViewById(R.id.cardAddExpense);
+        cardOverview = findViewById(R.id.cardOverview);
 
         // Expense Views
         etExpenseTitle = findViewById(R.id.etExpenseTitle);
         etExpenseAmount = findViewById(R.id.etExpenseAmount);
         btnAddExpense = findViewById(R.id.btnAddExpense);
+        
         tvExpToday = findViewById(R.id.tvExpToday);
         tvExpTotal = findViewById(R.id.tvExpTotal);
         tvExpRevenue = findViewById(R.id.tvExpRevenue);
         tvExpNet = findViewById(R.id.tvExpNet);
         rvRecentExpenses = findViewById(R.id.rvRecentExpenses);
+        autoCompleteCategory = findViewById(R.id.autoCompleteCategory);
 
         rvProducts.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ProductManageAdapter(new ArrayList<>(), this);
@@ -93,10 +105,17 @@ public class ProductsActivity extends AppCompatActivity implements ProductManage
                 if (tab.getPosition() == 0) {
                     productsSection.setVisibility(View.VISIBLE);
                     expensesSection.setVisibility(View.GONE);
+                    historySection.setVisibility(View.GONE);
                     refreshList();
-                } else {
+                } else if (tab.getPosition() == 1) {
                     productsSection.setVisibility(View.GONE);
                     expensesSection.setVisibility(View.VISIBLE);
+                    historySection.setVisibility(View.GONE);
+                    updateExpenseUI();
+                } else {
+                    productsSection.setVisibility(View.GONE);
+                    expensesSection.setVisibility(View.GONE);
+                    historySection.setVisibility(View.VISIBLE);
                     updateExpenseUI();
                 }
             }
@@ -109,10 +128,19 @@ public class ProductsActivity extends AppCompatActivity implements ProductManage
         });
 
         setupSearch();
+        setupCategoryFilter();
         
         // Hide content until authorized
         hideContent();
         promptForPassword();
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                setEnabled(false);
+                ProductsActivity.this.getOnBackPressedDispatcher().onBackPressed();
+            }
+        });
     }
 
     private void hideContent() {
@@ -135,16 +163,24 @@ public class ProductsActivity extends AppCompatActivity implements ProductManage
                     String password = etPassword.getText().toString();
                     
                     // Check if this password exists in the users table
-                    boolean isValid = checkOwnerPassword(password);
-                    
-                    if (isValid) {
-                        isAuthorized = true;
-                        showContent();
-                        Toast.makeText(this, "Access Granted", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(this, "Incorrect Owner Password", Toast.LENGTH_SHORT).show();
-                        finish(); // Close activity on wrong password
-                    }
+                    new Thread(() -> {
+                        User user = db.userDao().getUserByPassword(password);
+                        runOnUiThread(() -> {
+                            if (user != null) {
+                                isAuthorized = true;
+                                this.userId = user.id;
+                                // Save to prefs to maintain session
+                                getSharedPreferences("UserPrefs", MODE_PRIVATE).edit().putInt("userId", userId).apply();
+                                
+                                showContent();
+                                setupCategoryFilter(); // Refresh category filter with correct userId
+                                Toast.makeText(this, "Access Granted", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(this, "Incorrect Owner Password", Toast.LENGTH_SHORT).show();
+                                finish(); // Close activity on wrong password
+                            }
+                        });
+                    }).start();
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> finish())
                 .show();
@@ -180,17 +216,76 @@ public class ProductsActivity extends AppCompatActivity implements ProductManage
 
     private void performSearch(String query) {
         List<Product> results;
-        if (query.isEmpty()) {
+        if (query.isEmpty() && (selectedCategory == null || selectedCategory.equals("All Categories"))) {
             results = db.productDao().getAll(userId);
         } else {
-            results = db.productDao().searchProducts(userId, query);
+            // Apply both search and category filter
+            List<Product> all = db.productDao().getAll(userId);
+            results = new ArrayList<>();
+            for (Product p : all) {
+                boolean matchesQuery = query.isEmpty() || p.name.toLowerCase().contains(query.toLowerCase());
+                boolean matchesCategory = selectedCategory.equals("All Categories") || p.category.equalsIgnoreCase(selectedCategory);
+                if (matchesQuery && matchesCategory) {
+                    results.add(p);
+                }
+            }
         }
         adapter.updateList(results);
     }
 
+    private void setupCategoryFilter() {
+        new Thread(() -> {
+            List<String> categories = db.productDao().getUniqueCategories(userId);
+            List<String> filterList = new ArrayList<>();
+            filterList.add("All Categories");
+            for (String cat : categories) {
+                if (cat != null && !cat.isEmpty() && !cat.equalsIgnoreCase("Add New...")) {
+                    filterList.add(cat);
+                }
+            }
+
+            runOnUiThread(() -> {
+                android.widget.ArrayAdapter<String> catAdapter = new android.widget.ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, filterList);
+                autoCompleteCategory.setAdapter(catAdapter);
+                autoCompleteCategory.setText("All Categories", false);
+
+                // Show dropdown when focused to show all categories
+                autoCompleteCategory.setOnFocusChangeListener((v, hasFocus) -> {
+                    if (hasFocus) {
+                        autoCompleteCategory.showDropDown();
+                    }
+                });
+                autoCompleteCategory.setOnClickListener(v -> autoCompleteCategory.showDropDown());
+
+                autoCompleteCategory.setOnItemClickListener((parent, view, position, id) -> {
+                    selectedCategory = filterList.get(position);
+                    performSearch(searchView.getQuery().toString());
+                });
+
+                autoCompleteCategory.addTextChangedListener(new android.text.TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        if (s.toString().isEmpty()) {
+                            selectedCategory = "All Categories";
+                            performSearch(searchView.getQuery().toString());
+                        }
+                    }
+                    @Override
+                    public void afterTextChanged(android.text.Editable s) {}
+                });
+            });
+        }).start();
+    }
+
     private void refreshList() {
-        List<Product> products = db.productDao().getAll(userId);
-        adapter.updateList(products);
+        new Thread(() -> {
+            List<Product> products = db.productDao().getAll(userId);
+            runOnUiThread(() -> {
+                adapter.updateList(products);
+            });
+        }).start();
     }
 
     private void showProductDialog(Product product) {
@@ -200,50 +295,73 @@ public class ProductsActivity extends AppCompatActivity implements ProductManage
         EditText etPrice = dialogView.findViewById(R.id.etPrice);
         EditText etQuantity = dialogView.findViewById(R.id.etQuantity);
         EditText etLimit = dialogView.findViewById(R.id.etLimit);
-        android.widget.Spinner spinnerCategory = dialogView.findViewById(R.id.spinnerCategory);
-        EditText etCustomCategory = dialogView.findViewById(R.id.etCustomCategory);
+        AutoCompleteTextView autoCompleteCategory = dialogView.findViewById(R.id.autoCompleteDialogCategory);
+        android.widget.CheckBox cbHasExpiration = dialogView.findViewById(R.id.cbHasExpiration);
+        EditText etExpirationDate = dialogView.findViewById(R.id.etExpirationDate);
 
-        String[] categories = {"General", "Food", "Beverages", "Electronics", "Clothing", "Others"};
-        android.widget.ArrayAdapter<String> catAdapter = new android.widget.ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
-        catAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerCategory.setAdapter(catAdapter);
+        final java.util.Calendar cal = java.util.Calendar.getInstance();
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US);
 
-        spinnerCategory.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
-                if (categories[position].equals("Others")) {
-                    etCustomCategory.setVisibility(View.VISIBLE);
-                } else {
-                    etCustomCategory.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+        cbHasExpiration.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            etExpirationDate.setVisibility(isChecked ? View.VISIBLE : View.GONE);
         });
 
-        String title = "Add Product";
+        etExpirationDate.setOnClickListener(v -> {
+            new android.app.DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+                cal.set(java.util.Calendar.YEAR, year);
+                cal.set(java.util.Calendar.MONTH, month);
+                cal.set(java.util.Calendar.DAY_OF_MONTH, dayOfMonth);
+                etExpirationDate.setText(sdf.format(cal.getTime()));
+            }, cal.get(java.util.Calendar.YEAR), cal.get(java.util.Calendar.MONTH), cal.get(java.util.Calendar.DAY_OF_MONTH)).show();
+        });
+
+        // Fetch existing categories from DB
+        new Thread(() -> {
+            List<String> dbCategories = db.productDao().getUniqueCategories(userId);
+            runOnUiThread(() -> {
+                List<String> categoryList = new ArrayList<>();
+                for (String cat : dbCategories) {
+                    if (cat != null && !cat.isEmpty() && !cat.equalsIgnoreCase("General")) {
+                        categoryList.add(cat);
+                    }
+                }
+                categoryList.add(0, "General");
+
+                android.widget.ArrayAdapter<String> catAdapter = new android.widget.ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, categoryList);
+                autoCompleteCategory.setAdapter(catAdapter);
+
+                // Show dropdown when focused to show all categories
+                autoCompleteCategory.setOnFocusChangeListener((v, hasFocus) -> {
+                    if (hasFocus) {
+                        autoCompleteCategory.showDropDown();
+                    }
+                });
+                autoCompleteCategory.setOnClickListener(v -> autoCompleteCategory.showDropDown());
+
+                if (product != null) {
+                    autoCompleteCategory.setText(product.category, false);
+                    cbHasExpiration.setChecked(product.hasExpiration);
+                    if (product.hasExpiration) {
+                        etExpirationDate.setVisibility(View.VISIBLE);
+                        if (product.expirationDate != null) {
+                            cal.setTimeInMillis(product.expirationDate);
+                            etExpirationDate.setText(sdf.format(cal.getTime()));
+                        }
+                    }
+                } else {
+                    autoCompleteCategory.setText("General", false);
+                }
+            });
+        }).start();
+
+        String title = "Add New Product";
         if (product != null) {
             title = "Edit Product";
             etName.setText(product.name);
             etCost.setText(String.valueOf(product.cost));
             etPrice.setText(String.valueOf(product.price));
-            etQuantity.setText(String.valueOf(product.quantity));
-            etLimit.setText(String.valueOf(product.quantityLimit));
-
-            boolean found = false;
-            for (int i = 0; i < categories.length; i++) {
-                if (categories[i].equalsIgnoreCase(product.category)) {
-                    spinnerCategory.setSelection(i);
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                spinnerCategory.setSelection(categories.length - 1); // Select "Others"
-                etCustomCategory.setVisibility(View.VISIBLE);
-                etCustomCategory.setText(product.category);
-            }
+            etQuantity.setText(String.valueOf(product.stock));
+            etLimit.setText(String.valueOf(product.minStock));
         }
 
         new AlertDialog.Builder(this)
@@ -255,24 +373,91 @@ public class ProductsActivity extends AppCompatActivity implements ProductManage
                     double price = Double.parseDouble(etPrice.getText().toString().isEmpty() ? "0" : etPrice.getText().toString());
                     int qty = Integer.parseInt(etQuantity.getText().toString().isEmpty() ? "0" : etQuantity.getText().toString());
                     int limit = Integer.parseInt(etLimit.getText().toString().isEmpty() ? "0" : etLimit.getText().toString());
-                    String category = spinnerCategory.getSelectedItem().toString();
-                    if (category.equals("Others") && !etCustomCategory.getText().toString().trim().isEmpty()) {
-                        category = etCustomCategory.getText().toString().trim();
+                    String category = autoCompleteCategory.getText().toString().trim();
+                    if (category.isEmpty()) category = "General";
+
+                    boolean hasExp = cbHasExpiration.isChecked();
+                    Long expDate = null;
+                    if (hasExp && !etExpirationDate.getText().toString().isEmpty()) {
+                        try {
+                            expDate = sdf.parse(etExpirationDate.getText().toString()).getTime();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
 
-                    if (product == null) {
-                        Product p = new Product(name, cost, price, qty, limit, category, userId);
-                        db.productDao().insert(p);
-                    } else {
-                        product.name = name;
-                        product.cost = cost;
-                        product.price = price;
-                        product.quantity = qty;
-                        product.quantityLimit = limit;
-                        product.category = category;
-                        db.productDao().update(product);
+                    final String finalCategory = category;
+                    final Long finalExpDate = expDate;
+                    new Thread(() -> {
+                        if (product == null) {
+                            Product p = new Product(name, cost, price, qty, limit, finalCategory, userId, hasExp, finalExpDate);
+                            db.productDao().insert(p);
+                        } else {
+                            product.name = name;
+                            product.cost = cost;
+                            product.price = price;
+                            product.stock = qty;
+                            product.minStock = limit;
+                            product.category = finalCategory;
+                            product.hasExpiration = hasExp;
+                            product.expirationDate = finalExpDate;
+                            db.productDao().update(product);
+                        }
+                        runOnUiThread(() -> {
+                            refreshList();
+                            Toast.makeText(this, "Product Saved under " + finalCategory, Toast.LENGTH_SHORT).show();
+                        });
+                    }).start();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    @Override
+    public void onEdit(Expense expense) {
+        EditText etTitle = new EditText(this);
+        etTitle.setText(expense.title);
+        etTitle.setHint("Title");
+        etTitle.setTextColor(getResources().getColor(R.color.black));
+
+        EditText etAmount = new EditText(this);
+        etAmount.setText(String.valueOf(expense.amount));
+        etAmount.setHint("Amount");
+        etAmount.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        etAmount.setTextColor(getResources().getColor(R.color.black));
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(50, 40, 50, 40);
+        layout.addView(etTitle);
+        layout.addView(etAmount);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Edit Expense")
+                .setView(layout)
+                .setPositiveButton("Update", (dialog, which) -> {
+                    String title = etTitle.getText().toString().trim();
+                    String amountStr = etAmount.getText().toString().trim();
+                    if (!title.isEmpty() && !amountStr.isEmpty()) {
+                        expense.title = title;
+                        expense.amount = Double.parseDouble(amountStr);
+                        db.expenseDao().update(expense);
+                        updateExpenseUI();
+                        Toast.makeText(this, "Expense updated", Toast.LENGTH_SHORT).show();
                     }
-                    refreshList();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    public void onDelete(Expense expense) {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Expense")
+                .setMessage("Are you sure you want to delete this expense?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    db.expenseDao().delete(expense);
+                    updateExpenseUI();
+                    Toast.makeText(this, "Expense deleted", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
@@ -322,7 +507,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductManage
     private void updateExpenseUI() {
         List<Expense> expenses = db.expenseDao().getAllExpenses(userId);
         if (expenseAdapter == null) {
-            expenseAdapter = new ExpenseAdapter(expenses);
+            expenseAdapter = new ExpenseAdapter(expenses, this);
             rvRecentExpenses.setAdapter(expenseAdapter);
         } else {
             expenseAdapter.updateList(expenses);

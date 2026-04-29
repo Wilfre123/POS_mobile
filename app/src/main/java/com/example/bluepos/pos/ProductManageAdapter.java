@@ -38,7 +38,7 @@ public class ProductManageAdapter extends RecyclerView.Adapter<ProductManageAdap
         Product product = productList.get(position);
         holder.tvName.setText(product.name);
         holder.tvPrice.setText(String.format(Locale.US, "₱%.2f", product.price));
-        holder.tvStock.setText("Stock: " + product.quantity);
+        holder.tvStock.setText("Stock: " + product.stock);
 
         holder.btnEdit.setOnClickListener(v -> listener.onEdit(product));
         holder.btnDelete.setOnClickListener(v -> listener.onDelete(product));

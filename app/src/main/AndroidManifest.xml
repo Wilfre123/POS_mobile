@@ -37,5 +37,9 @@
             android:label="POS System"
             android:exported="false" />
 
+        <activity android:name="com.example.bluepos.SettingsActivity"
+            android:label="Settings"
+            android:exported="false" />
+
     </application>
 </manifest>

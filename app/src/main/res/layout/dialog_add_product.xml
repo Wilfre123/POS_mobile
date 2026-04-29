@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp">
@@ -9,20 +10,14 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add New Product"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@color/primary_green"
-            android:layout_marginBottom="16dp"/>
 
         <EditText
             android:id="@+id/etName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Item Name"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gray_text"
             android:inputType="text"/>
 
         <EditText
@@ -30,6 +25,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Cost Price"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gray_text"
             android:inputType="numberDecimal"/>
 
         <EditText
@@ -37,6 +34,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Selling Price"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gray_text"
             android:inputType="numberDecimal"/>
 
         <EditText
@@ -44,6 +43,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Initial Quantity"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gray_text"
             android:inputType="number"/>
 
         <EditText
@@ -51,23 +52,45 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Quantity Limit (Low Stock Warning)"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gray_text"
             android:inputType="number"/>
 
-        <Spinner
-            android:id="@+id/spinnerCategory"
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:minHeight="48dp" />
+            app:hintEnabled="true">
 
-        <EditText
-            android:id="@+id/etCustomCategory"
+            <AutoCompleteTextView
+                android:id="@+id/autoCompleteDialogCategory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Category"
+                android:inputType="text"
+                android:paddingHorizontal="12dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <CheckBox
+            android:id="@+id/cbHasExpiration"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Or enter new category"
-            android:inputType="text"
+            android:layout_marginTop="8dp"
+            android:text="Has Expiration Date?"
+            android:textColor="@color/black" />
+
+        <EditText
+            android:id="@+id/etExpirationDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Expiration Date (YYYY-MM-DD)"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gray_text"
+            android:focusable="false"
+            android:clickable="true"
             android:visibility="gone"
-            android:layout_marginTop="4dp"/>
+            android:inputType="none"/>
 
     </LinearLayout>
 </ScrollView>

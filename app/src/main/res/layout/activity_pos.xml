@@ -64,13 +64,12 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar">
 
-            <!-- CASHIER CONTENT (Previously the main POS content) -->
+            <!-- CASHIER CONTENT -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cashier_content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <!-- Full Width Search -->
                 <EditText
                     android:id="@+id/etSearch"
                     android:layout_width="match_parent"
@@ -80,11 +79,12 @@
                     android:drawableStart="@android:drawable/ic_menu_search"
                     android:drawablePadding="8dp"
                     android:hint="Search products..."
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/gray_text"
                     android:paddingHorizontal="12dp"
                     android:textSize="14sp"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <!-- Full Width Product Grid -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvProducts"
                     android:layout_width="match_parent"
@@ -95,7 +95,6 @@
                     app:layout_constraintBottom_toTopOf="@id/bottom_bar"
                     app:layout_constraintTop_toBottomOf="@id/etSearch" />
 
-                <!-- Bottom Bar (Updated: Total, Change, and Payment) -->
                 <LinearLayout
                     android:id="@+id/bottom_bar"
                     android:layout_width="match_parent"
@@ -145,6 +144,8 @@
                             android:background="@drawable/search_bg"
                             android:gravity="center"
                             android:hint="Paid"
+                            android:textColor="@color/black"
+                            android:textColorHint="@color/gray_text"
                             android:inputType="numberDecimal"
                             android:textSize="14sp" />
 
@@ -168,375 +169,241 @@
                         android:textStyle="bold"
                         app:cornerRadius="8dp" />
                 </LinearLayout>
-
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- DASHBOARD CONTENT -->
             <androidx.core.widget.NestedScrollView
                 android:id="@+id/dashboard_content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="#F0F4F7"
                 android:visibility="gone">
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- Main Stats Card -->
+                    <!-- Financial Summary Card -->
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         app:cardCornerRadius="12dp"
-                        app:cardElevation="4dp">
-
+                        app:cardElevation="2dp">
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:padding="16dp">
-
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Net Income"
                                 android:textColor="@color/gray_text"
-                                android:textSize="14sp" />
-
+                                android:textSize="12sp" />
                             <TextView
                                 android:id="@+id/tvNetIncome"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="₱0.00"
                                 android:textColor="@color/black"
-                                android:textSize="28sp"
+                                android:textSize="24sp"
                                 android:textStyle="bold" />
-
                             <View
                                 android:layout_width="match_parent"
                                 android:layout_height="1dp"
                                 android:layout_marginVertical="12dp"
                                 android:background="#EEEEEE" />
-
                             <GridLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:columnCount="2"
-                                android:rowCount="2">
-
+                                android:columnCount="2">
                                 <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_columnWeight="1"
                                     android:orientation="vertical">
-
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="Total Revenue"
                                         android:textColor="@color/gray_text"
-                                        android:textSize="12sp" />
-
+                                        android:textSize="11sp" />
                                     <TextView
                                         android:id="@+id/tvTotalRevenue"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="₱0.00"
                                         android:textColor="@color/primary_green"
-                                        android:textSize="16sp"
+                                        android:textSize="15sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
-
                                 <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_columnWeight="1"
                                     android:orientation="vertical">
-
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="Total Expenses"
                                         android:textColor="@color/gray_text"
-                                        android:textSize="12sp" />
-
+                                        android:textSize="11sp" />
                                     <TextView
                                         android:id="@+id/tvTotalExpenses"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="₱0.00"
                                         android:textColor="#F44336"
-                                        android:textSize="16sp"
+                                        android:textSize="15sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </GridLayout>
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
-                    <!-- Revenue Trend Chart -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="4dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="16dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="12dp"
-                                android:text="Revenue Trend (Recent)"
-                                android:textColor="@color/black"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-
-                            <com.github.mikephil.charting.charts.LineChart
-                                android:id="@+id/revenueChart"
-                                android:layout_width="match_parent"
-                                android:layout_height="200dp" />
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-
-                    <!-- Sales by Category Pie Chart -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="4dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="16dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="12dp"
-                                android:text="Sales by Category"
-                                android:textColor="@color/black"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-
-                            <com.github.mikephil.charting.charts.PieChart
-                                android:id="@+id/salesCategoryChart"
-                                android:layout_width="match_parent"
-                                android:layout_height="250dp" />
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-
-                    <!-- Stock Inventory by Category Pie Chart -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="4dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="16dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="12dp"
-                                android:text="Stock Inventory by Category"
-                                android:textColor="@color/black"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-
-                            <com.github.mikephil.charting.charts.PieChart
-                                android:id="@+id/stockCategoryChart"
-                                android:layout_width="match_parent"
-                                android:layout_height="250dp" />
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-
-                    <!-- Secondary Stats Grid -->
                     <GridLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:alignmentMode="alignMargins"
                         android:columnCount="2"
-                        android:rowCount="3">
+                        android:rowCount="2"
+                        android:layout_marginBottom="16dp">
 
-                        <!-- Today's Sales -->
                         <androidx.cardview.widget.CardView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_rowWeight="1"
                             android:layout_columnWeight="1"
                             android:layout_margin="4dp"
-                            app:cardCornerRadius="8dp">
-
+                            app:cardCornerRadius="12dp">
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="vertical"
                                 android:padding="12dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Today's Sales"
-                                    android:textSize="12sp" />
-
-                                <TextView
-                                    android:id="@+id/tvTodaySales"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="₱0.00"
-                                    android:textColor="@color/black"
-                                    android:textSize="16sp"
-                                    android:textStyle="bold" />
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Today Sales" android:textColor="@color/gray_text" android:textSize="12sp" />
+                                <TextView android:id="@+id/tvTodaySales" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="₱0.00" android:textColor="@color/primary_green" android:textSize="18sp" android:textStyle="bold" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
-                        <!-- Total Products -->
                         <androidx.cardview.widget.CardView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_rowWeight="1"
                             android:layout_columnWeight="1"
                             android:layout_margin="4dp"
-                            app:cardCornerRadius="8dp">
-
+                            app:cardCornerRadius="12dp">
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="vertical"
                                 android:padding="12dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Total Products"
-                                    android:textSize="12sp" />
-
-                                <TextView
-                                    android:id="@+id/tvTotalProducts"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="0"
-                                    android:textColor="@color/black"
-                                    android:textSize="16sp"
-                                    android:textStyle="bold" />
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Items Sold" android:textColor="@color/gray_text" android:textSize="12sp" />
+                                <TextView android:id="@+id/tvItemsSold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="@color/black" android:textSize="18sp" android:textStyle="bold" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
-                        <!-- Total Sales Count -->
                         <androidx.cardview.widget.CardView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_rowWeight="1"
                             android:layout_columnWeight="1"
                             android:layout_margin="4dp"
-                            app:cardCornerRadius="8dp">
-
+                            app:cardCornerRadius="12dp">
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="vertical"
                                 android:padding="12dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Total Sales"
-                                    android:textSize="12sp" />
-
-                                <TextView
-                                    android:id="@+id/tvTotalSalesCount"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="0"
-                                    android:textColor="@color/black"
-                                    android:textSize="16sp"
-                                    android:textStyle="bold" />
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Inventory" android:textColor="@color/gray_text" android:textSize="12sp" />
+                                <TextView android:id="@+id/tvTotalProducts" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="@color/black" android:textSize="18sp" android:textStyle="bold" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
-                        <!-- Items Sold -->
                         <androidx.cardview.widget.CardView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_rowWeight="1"
                             android:layout_columnWeight="1"
                             android:layout_margin="4dp"
-                            app:cardCornerRadius="8dp">
-
+                            app:cardCornerRadius="12dp">
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="vertical"
                                 android:padding="12dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Items Sold"
-                                    android:textSize="12sp" />
-
-                                <TextView
-                                    android:id="@+id/tvItemsSold"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="0"
-                                    android:textColor="@color/black"
-                                    android:textSize="16sp"
-                                    android:textStyle="bold" />
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Low Stock" android:textColor="@color/gray_text" android:textSize="12sp" />
+                                <TextView android:id="@+id/tvLowStock" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#F44336" android:textSize="18sp" android:textStyle="bold" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
-
-                        <!-- Low Stock Items -->
-                        <androidx.cardview.widget.CardView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_rowWeight="1"
-                            android:layout_columnWeight="1"
-                            android:layout_margin="4dp"
-                            app:cardCornerRadius="8dp">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:padding="12dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Low Stock Items"
-                                    android:textSize="12sp" />
-
-                                <TextView
-                                    android:id="@+id/tvLowStock"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="0"
-                                    android:textColor="#F44336"
-                                    android:textSize="16sp"
-                                    android:textStyle="bold" />
-                            </LinearLayout>
-                        </androidx.cardview.widget.CardView>
-
                     </GridLayout>
 
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        app:cardCornerRadius="12dp">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Weekly Sales Performance"
+                                android:textStyle="bold"
+                                android:layout_marginBottom="8dp"/>
+                            <com.github.mikephil.charting.charts.LineChart
+                                android:id="@+id/revenueChart"
+                                android:layout_width="match_parent"
+                                android:layout_height="220dp"/>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        app:cardCornerRadius="12dp">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Sales by Category"
+                                android:textStyle="bold"
+                                android:layout_marginBottom="8dp"/>
+                            <com.github.mikephil.charting.charts.PieChart
+                                android:id="@+id/salesCategoryChart"
+                                android:layout_width="match_parent"
+                                android:layout_height="280dp"/>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        app:cardCornerRadius="12dp">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Inventory by Category"
+                                android:textStyle="bold"
+                                android:layout_marginBottom="8dp"/>
+                            <com.github.mikephil.charting.charts.PieChart
+                                android:id="@+id/stockCategoryChart"
+                                android:layout_width="match_parent"
+                                android:layout_height="280dp"/>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <TextView android:id="@+id/tvTotalSalesCount" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
                 </LinearLayout>
             </androidx.core.widget.NestedScrollView>
 
@@ -547,126 +414,107 @@
                 android:layout_height="match_parent"
                 android:background="#F0F4F7"
                 android:visibility="gone">
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- Statistics Summary Card -->
+                    <!-- Financial Summary Card (Stats) -->
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         app:cardCornerRadius="12dp"
-                        app:cardElevation="4dp">
-
+                        app:cardElevation="2dp">
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:padding="16dp">
-
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="20-Day Net Income"
+                                android:text="Overall Performance"
                                 android:textColor="@color/gray_text"
-                                android:textSize="14sp" />
-
+                                android:textSize="12sp" />
                             <TextView
                                 android:id="@+id/tvStatsNetIncome"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="₱0.00"
                                 android:textColor="@color/black"
-                                android:textSize="28sp"
+                                android:textSize="24sp"
                                 android:textStyle="bold" />
-
                             <View
                                 android:layout_width="match_parent"
                                 android:layout_height="1dp"
                                 android:layout_marginVertical="12dp"
                                 android:background="#EEEEEE" />
-
                             <GridLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:columnCount="2">
-
                                 <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_columnWeight="1"
                                     android:orientation="vertical">
-
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="Total Revenue"
                                         android:textColor="@color/gray_text"
-                                        android:textSize="12sp" />
-
+                                        android:textSize="11sp" />
                                     <TextView
                                         android:id="@+id/tvStatsTotalRevenue"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="₱0.00"
                                         android:textColor="@color/primary_green"
-                                        android:textSize="20sp"
+                                        android:textSize="15sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
-
                                 <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_columnWeight="1"
                                     android:orientation="vertical">
-
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="Total Expenses"
                                         android:textColor="@color/gray_text"
-                                        android:textSize="12sp" />
-
+                                        android:textSize="11sp" />
                                     <TextView
                                         android:id="@+id/tvStatsTotalExpenses"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="₱0.00"
                                         android:textColor="#F44336"
-                                        android:textSize="20sp"
+                                        android:textSize="15sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </GridLayout>
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
-                    <!-- Expenses vs Revenue Trend -->
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="4dp">
-
+                        app:cardCornerRadius="12dp">
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:padding="16dp">
-
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="12dp"
-                                android:text="Expenses vs Revenue (Current Trend)"
-                                android:textColor="@color/black"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-
+                                android:text="Revenue vs Expenses (Last 15 Days)"
+                                android:textStyle="bold"
+                                android:layout_marginBottom="8dp"/>
                             <com.github.mikephil.charting.charts.LineChart
                                 android:id="@+id/expenseRevenueChart"
                                 android:layout_width="match_parent"
@@ -674,36 +522,28 @@
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
-                    <!-- Top Sold Products Chart -->
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="4dp">
-
+                        app:cardCornerRadius="12dp">
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:padding="16dp">
-
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="12dp"
-                                android:text="Top Sold Products (Units &amp; Revenue)"
-                                android:textColor="@color/black"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-
+                                android:text="Top Selling Products"
+                                android:textStyle="bold"
+                                android:layout_marginBottom="8dp"/>
                             <com.github.mikephil.charting.charts.HorizontalBarChart
                                 android:id="@+id/topProductsChart"
                                 android:layout_width="match_parent"
-                                android:layout_height="400dp" />
+                                android:layout_height="350dp" />
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
-
                 </LinearLayout>
             </androidx.core.widget.NestedScrollView>
 
@@ -715,54 +555,19 @@
                 android:orientation="vertical"
                 android:padding="16dp"
                 android:visibility="gone">
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
-                    android:text="Reports &amp; Exports"
+                    android:text="Reports"
                     android:textSize="20sp"
-                    android:textStyle="bold" />
-
-                <androidx.cardview.widget.CardView
+                    android:textStyle="bold"
+                    android:layout_marginBottom="16dp"/>
+                <Button
+                    android:id="@+id/btnExportProducts"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="4dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Products Report"
-                            android:textColor="@color/black"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="Export your current inventory list to an Excel file (.xlsx)"
-                            android:textColor="@color/gray_text"
-                            android:textSize="12sp" />
-
-                        <Button
-                            android:id="@+id/btnExportProducts"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            android:backgroundTint="@color/primary_green"
-                            android:text="Download Products Excel"
-                            android:textColor="@color/white"
-                            app:icon="@android:drawable/stat_sys_download" />
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                    android:text="Export Products Excel"
+                    android:backgroundTint="@color/primary_green"/>
             </LinearLayout>
 
             <!-- SALES HISTORY CONTENT -->
@@ -771,7 +576,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone">
-
                 <TextView
                     android:id="@+id/tvSalesHeader"
                     android:layout_width="wrap_content"
@@ -780,18 +584,200 @@
                     android:text="Sales History"
                     android:textSize="20sp"
                     android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvSales"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tvSalesHeader" />
-
+                    app:layout_constraintTop_toBottomOf="@id/tvSalesHeader"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- RESERVATIONS CONTENT -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/reservations_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+                <TextView android:id="@+id/tvReservationsHeader" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Reservations" android:layout_margin="16dp" android:textSize="20sp" android:textStyle="bold" app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"/>
+                <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvReservations" android:layout_width="match_parent" android:layout_height="0dp" app:layout_constraintTop_toBottomOf="@id/tvReservationsHeader" app:layout_constraintBottom_toTopOf="@id/btnAddReservation"/>
+                <Button android:id="@+id/btnAddReservation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="56dp"
+                    android:layout_margin="16dp"
+                    android:paddingHorizontal="32dp"
+                    android:text="Add Reservation"
+                    android:backgroundTint="@color/primary_green"
+                    app:cornerRadius="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- DEBTS CONTENT -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/debts_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+                <TextView android:id="@+id/tvDebtsHeader" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Debts" android:layout_margin="16dp" android:textSize="20sp" android:textStyle="bold" app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"/>
+                <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvDebts" android:layout_width="match_parent" android:layout_height="0dp" app:layout_constraintTop_toBottomOf="@id/tvDebtsHeader" app:layout_constraintBottom_toTopOf="@id/btnAddDebt"/>
+                <Button android:id="@+id/btnAddDebt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="56dp"
+                    android:layout_margin="16dp"
+                    android:paddingHorizontal="32dp"
+                    android:text="Add Debt"
+                    android:backgroundTint="@color/primary_green"
+                    app:cornerRadius="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- SETTINGS CONTENT -->
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/settings_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#F0F4F7"
+                android:visibility="gone">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cardEditProfile"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="2dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="16dp"
+                            android:gravity="center_vertical">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@android:drawable/ic_menu_edit"
+                                app:tint="@color/primary_green" />
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="16dp"
+                                android:text="Edit Profile"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cardExportData"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="2dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="16dp"
+                            android:gravity="center_vertical">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@android:drawable/ic_menu_save"
+                                app:tint="@color/primary_green" />
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="16dp"
+                                android:text="Export All Data"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cardImportData"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="2dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="16dp"
+                            android:gravity="center_vertical">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@android:drawable/ic_menu_upload"
+                                app:tint="@color/primary_green" />
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="16dp"
+                                android:text="Import All Data"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cardResetData"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="2dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="16dp"
+                            android:gravity="center_vertical">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@android:drawable/ic_menu_delete"
+                                app:tint="#D32F2F" />
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="16dp"
+                                android:text="Reset My Data"
+                                android:textSize="16sp"
+                                android:textColor="#D32F2F"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+                </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
 
             <!-- CART CONTENT -->
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -803,15 +789,12 @@
                 <EditText
                     android:id="@+id/etSearchCart"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="12dp"
+                    android:layout_height="45dp"
+                    android:layout_margin="12dp"
                     android:background="@drawable/search_bg"
-                    android:drawableStart="@android:drawable/ic_menu_search"
-                    android:drawablePadding="8dp"
                     android:hint="Search in cart..."
                     android:paddingHorizontal="12dp"
-                    android:textSize="13sp"
+                    android:textSize="14sp"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -819,13 +802,45 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_marginTop="8dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:paddingHorizontal="8dp"
+                    android:clipToPadding="false"
+                    app:layout_constraintBottom_toTopOf="@id/cart_bottom_bar"
                     app:layout_constraintTop_toBottomOf="@id/etSearchCart" />
 
+                <LinearLayout
+                    android:id="@+id/cart_bottom_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:elevation="8dp"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <TextView
+                        android:id="@+id/tvCartTotal2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="Total: ₱0.00"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnCheckout2"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginTop="8dp"
+                        android:backgroundTint="@color/primary_green"
+                        android:text="Checkout"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        app:cornerRadius="8dp" />
+                </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
+
         </FrameLayout>
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.navigation.NavigationView
