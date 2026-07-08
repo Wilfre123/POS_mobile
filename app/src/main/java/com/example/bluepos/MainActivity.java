@@ -25,6 +25,9 @@ public class MainActivity extends AppCompatActivity {
     private AppDatabase db;
     private ExpiringProductAdapter expiringAdapter;
     private int userId;
+    private String userRole;
+    private int adminId;
+    private int dataOwnerId;
 
     private TextView tvNotificationBadge;
     private android.view.View btnNotification;
@@ -44,6 +47,12 @@ public class MainActivity extends AppCompatActivity {
         android.view.View headerView = navigationView.getHeaderView(0);
         TextView tvUsername = headerView.findViewById(R.id.nav_header_username);
         android.content.SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        userId = prefs.getInt("userId", -1);
+        userRole = prefs.getString("userRole", "Admin");
+        adminId = prefs.getInt("adminId", -1);
+        dataOwnerId = "Staff".equals(userRole) ? adminId : userId;
+        if (dataOwnerId == -1) dataOwnerId = userId;
+
         String username = prefs.getString("username", "Guest User");
         if (tvUsername != null) tvUsername.setText(username);
 
@@ -57,13 +66,20 @@ public class MainActivity extends AppCompatActivity {
         CardView cardReports = findViewById(R.id.cardReports);
         CardView cardSettings = findViewById(R.id.cardSettings);
 
+        if ("Staff".equals(userRole)) {
+            cardInventory.setVisibility(android.view.View.GONE);
+            cardReports.setVisibility(android.view.View.GONE);
+            navigationView.getMenu().findItem(R.id.nav_products).setVisible(false);
+            navigationView.getMenu().findItem(R.id.nav_reports).setVisible(false);
+            navigationView.getMenu().findItem(R.id.nav_statistics).setVisible(false);
+            navigationView.getMenu().findItem(R.id.nav_dashboard).setVisible(false);
+        }
+
         cardPOS.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, POSActivity.class)));
 
-        cardInventory.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, ProductsActivity.class)));
-
-        cardReports.setOnClickListener(v -> {
+        cardInventory.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, POSActivity.class);
-            intent.putExtra("TARGET_VIEW", "REPORTS");
+            intent.putExtra("TARGET_VIEW", "INVENTORY");
             startActivity(intent);
         });
 
@@ -87,6 +103,10 @@ public class MainActivity extends AppCompatActivity {
             
             if (id == R.id.nav_pos) {
                 startActivity(new Intent(MainActivity.this, POSActivity.class));
+            } else if (id == R.id.nav_products) {
+                Intent intent = new Intent(MainActivity.this, POSActivity.class);
+                intent.putExtra("TARGET_VIEW", "INVENTORY");
+                startActivity(intent);
             } else if (id == R.id.nav_dashboard) {
                 Intent intent = new Intent(MainActivity.this, POSActivity.class);
                 intent.putExtra("TARGET_VIEW", "DASHBOARD");
@@ -111,8 +131,6 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, POSActivity.class);
                 intent.putExtra("TARGET_VIEW", "DEBTS");
                 startActivity(intent);
-            } else if (id == R.id.nav_products) {
-                startActivity(new Intent(MainActivity.this, ProductsActivity.class));
             } else if (id == R.id.nav_settings) {
                 Intent intent = new Intent(MainActivity.this, POSActivity.class);
                 intent.putExtra("TARGET_VIEW", "SETTINGS");
@@ -141,8 +159,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupExpiringProducts() {
         db = AppDatabase.getDatabase(this);
-        android.content.SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-        userId = prefs.getInt("userId", -1);
 
         RecyclerView rvExpiring = findViewById(R.id.rvExpiringProducts);
         rvExpiring.setLayoutManager(new LinearLayoutManager(this));
@@ -154,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void refreshExpiringProducts() {
         new Thread(() -> {
-            List<Product> allProducts = db.productDao().getAll(userId);
+            List<Product> allProducts = db.productDao().getAll(dataOwnerId);
             List<Product> expiringOnly = new ArrayList<>();
             for (Product p : allProducts) {
                 if (p.hasExpiration && p.expirationDate != null) {
@@ -176,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateNotificationBadge() {
         new Thread(() -> {
-            List<Product> products = db.productDao().getAll(userId);
+            List<Product> products = db.productDao().getAll(dataOwnerId);
             int lowStockCount = 0;
             for (Product p : products) {
                 if (p.stock <= p.minStock) lowStockCount++;
@@ -198,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void showLowStockDialog() {
         new Thread(() -> {
-            List<Product> products = db.productDao().getAll(userId);
+            List<Product> products = db.productDao().getAll(dataOwnerId);
             List<Product> lowStockItems = new ArrayList<>();
             for (Product p : products) {
                 if (p.stock <= p.minStock) lowStockItems.add(p);
@@ -213,7 +229,6 @@ public class MainActivity extends AppCompatActivity {
                 android.view.View dialogView = android.view.LayoutInflater.from(this).inflate(R.layout.dialog_low_stock, null);
                 android.widget.EditText etSearchLowStock = dialogView.findViewById(R.id.etSearchLowStock);
                 RecyclerView rvLowStock = dialogView.findViewById(R.id.rvLowStock);
-                android.widget.Button btnManageInventory = dialogView.findViewById(R.id.btnManageInventory);
 
                 rvLowStock.setLayoutManager(new LinearLayoutManager(this));
 
@@ -226,11 +241,6 @@ public class MainActivity extends AppCompatActivity {
                         .setView(dialogView)
                         .setPositiveButton("Close", null)
                         .create();
-
-                btnManageInventory.setOnClickListener(v -> {
-                    startActivity(new Intent(MainActivity.this, ProductsActivity.class));
-                    dialog.dismiss();
-                });
 
                 etSearchLowStock.addTextChangedListener(new android.text.TextWatcher() {
                     @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}

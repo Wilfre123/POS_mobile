@@ -52,6 +52,36 @@
         android:background="@android:drawable/editbox_background"
         android:layout_marginBottom="24dp"/>
 
+    <RadioGroup
+        android:id="@+id/rgRole"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+        <RadioButton
+            android:id="@+id/rbAdmin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Admin"
+            android:checked="true"/>
+        <RadioButton
+            android:id="@+id/rbStaff"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Staff"/>
+    </RadioGroup>
+
+    <Spinner
+        android:id="@+id/spinnerAdmin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone"
+        android:padding="12dp"
+        android:background="@android:drawable/btn_dropdown"/>
+
     <Button
         android:id="@+id/btnRegister"
         android:layout_width="match_parent"

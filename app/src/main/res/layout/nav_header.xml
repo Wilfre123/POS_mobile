@@ -25,10 +25,10 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/nav_header_subtitle"
+        android:id="@+id/nav_header_role"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="BluePOS System"
+        android:text="GreenPOS System"
         android:textColor="#E0E0E0" />
 
 </LinearLayout>

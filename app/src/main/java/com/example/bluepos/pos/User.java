@@ -10,10 +10,14 @@ public class User {
     public String name;
     public String email;
     public String password;
+    public String role; // "Admin" or "Staff"
+    public Integer adminId; // If Staff, this is the ID of their Admin
 
-    public User(String name, String email, String password) {
+    public User(String name, String email, String password, String role, Integer adminId) {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.role = role;
+        this.adminId = adminId;
     }
 }

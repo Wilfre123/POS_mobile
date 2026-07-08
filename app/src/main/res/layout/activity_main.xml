@@ -14,9 +14,9 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/primary_green"
-            app:titleTextColor="@color/white"
-            app:navigationIconTint="@color/white"
+            android:background="@color/white"
+            app:titleTextColor="@color/black"
+            app:navigationIconTint="@color/primary_green"
             app:layout_constraintTop_toTopOf="parent">
 
             <RelativeLayout
@@ -38,7 +38,7 @@
                         android:layout_height="28dp"
                         android:layout_margin="4dp"
                         android:src="@android:drawable/ic_popup_reminder"
-                        app:tint="@color/white" />
+                        app:tint="@color/primary_green" />
 
                     <TextView
                         android:id="@+id/tvNotificationBadge"
@@ -106,7 +106,7 @@
                         android:layout_height="wrap_content"
                         android:layout_columnWeight="1"
                         android:layout_margin="8dp"
-                        app:cardCornerRadius="12dp"
+                        app:cardCornerRadius="0dp"
                         app:cardElevation="4dp"
                         android:foreground="?attr/selectableItemBackground"
                         android:clickable="true"
@@ -129,7 +129,7 @@
                         android:layout_height="wrap_content"
                         android:layout_columnWeight="1"
                         android:layout_margin="8dp"
-                        app:cardCornerRadius="12dp"
+                        app:cardCornerRadius="0dp"
                         app:cardElevation="4dp"
                         android:foreground="?attr/selectableItemBackground"
                         android:clickable="true"
@@ -141,10 +141,12 @@
                             android:textStyle="bold"
                             android:gravity="center"
                             android:padding="16dp"
-                            app:drawableTopCompat="@android:drawable/ic_dialog_info"
+                            app:drawableTopCompat="@android:drawable/ic_menu_my_calendar"
                             android:drawablePadding="8dp"
                             app:drawableTint="@color/primary_green" />
                     </androidx.cardview.widget.CardView>
+
+
 
                     <androidx.cardview.widget.CardView
                         android:id="@+id/cardReports"
@@ -152,7 +154,7 @@
                         android:layout_height="wrap_content"
                         android:layout_columnWeight="1"
                         android:layout_margin="8dp"
-                        app:cardCornerRadius="12dp"
+                        app:cardCornerRadius="0dp"
                         app:cardElevation="4dp"
                         android:foreground="?attr/selectableItemBackground"
                         android:clickable="true"
@@ -175,7 +177,7 @@
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
                     android:layout_margin="8dp"
-                    app:cardCornerRadius="12dp"
+                    app:cardCornerRadius="0dp"
                     app:cardElevation="4dp"
                     android:foreground="?attr/selectableItemBackground"
                     android:clickable="true"

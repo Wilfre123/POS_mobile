@@ -32,7 +32,7 @@ public class DebtAdapter extends RecyclerView.Adapter<DebtAdapter.DebtViewHolder
 
     @NonNull
     @Override
-    public DebtViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public DebtViewHolder onCreateViewHolder(@NonNull android.view.ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_debt, parent, false);
         return new DebtViewHolder(view);
     }
@@ -42,7 +42,6 @@ public class DebtAdapter extends RecyclerView.Adapter<DebtAdapter.DebtViewHolder
         Debt debt = debts.get(position);
         holder.tvCustomerName.setText(debt.customerName);
         holder.tvProductName.setText(debt.productName + " x " + debt.quantity);
-        holder.tvDebtNote.setText(debt.note);
         holder.tvDebtAmount.setText(String.format("Amount: ₱%.2f", debt.amount));
         holder.tvDebtDate.setText("Date: " + dateFormat.format(new Date(debt.timestamp)));
         holder.tvDebtStatus.setText(debt.status.toUpperCase());
@@ -73,14 +72,13 @@ public class DebtAdapter extends RecyclerView.Adapter<DebtAdapter.DebtViewHolder
     }
 
     static class DebtViewHolder extends RecyclerView.ViewHolder {
-        TextView tvCustomerName, tvProductName, tvDebtNote, tvDebtAmount, tvDebtDate, tvDebtStatus;
+        TextView tvCustomerName, tvProductName, tvDebtAmount, tvDebtDate, tvDebtStatus;
         MaterialButton btnMarkPaid, btnDeleteDebt, btnUndoDebt;
 
         public DebtViewHolder(@NonNull View itemView) {
             super(itemView);
             tvCustomerName = itemView.findViewById(R.id.tvCustomerName);
             tvProductName = itemView.findViewById(R.id.tvProductName);
-            tvDebtNote = itemView.findViewById(R.id.tvDebtNote);
             tvDebtAmount = itemView.findViewById(R.id.tvDebtAmount);
             tvDebtDate = itemView.findViewById(R.id.tvDebtDate);
             tvDebtStatus = itemView.findViewById(R.id.tvDebtStatus);

@@ -19,7 +19,7 @@ public interface DebtDao {
     void delete(Debt debt);
 
     @Query("SELECT * FROM debts WHERE userId = :userId ORDER BY timestamp DESC")
-    List<Debt> getAllDebts(int userId);
+    List<Debt> getAllDebtsSync(int userId);
 
     @Query("SELECT * FROM debts WHERE userId = :userId AND status = :status ORDER BY timestamp DESC")
     List<Debt> getDebtsByStatus(int userId, String status);

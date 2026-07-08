@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="12dp">
 
     <EditText
         android:id="@+id/etSearchLowStock"
@@ -19,16 +19,9 @@
         android:id="@+id/rvLowStock"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:layout_marginTop="8dp" />
 
-    <Button
-        android:id="@+id/btnManageInventory"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="Manage Inventory"
-        android:backgroundTint="@color/primary_green"
-        android:textColor="@color/white"
-        style="@style/Widget.MaterialComponents.Button" />
+
 
 </LinearLayout>

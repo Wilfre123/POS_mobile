@@ -38,7 +38,7 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
 
     @NonNull
     @Override
-    public ExpenseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ExpenseViewHolder onCreateViewHolder(@NonNull android.view.ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_expense, parent, false);
         return new ExpenseViewHolder(view);
     }
@@ -49,7 +49,7 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
         holder.tvTitle.setText(expense.title);
         holder.tvAmount.setText(String.format(Locale.US, "₱%.2f", expense.amount));
         
-        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy hh:mm a", Locale.getDefault());
         holder.tvDate.setText(sdf.format(new Date(expense.timestamp)));
 
         holder.btnEdit.setOnClickListener(v -> {

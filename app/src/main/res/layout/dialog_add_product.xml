@@ -2,72 +2,122 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="16dp">
+    android:layout_height="wrap_content">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="12dp">
 
-
-        <EditText
-            android:id="@+id/etName"
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Item Name"
-            android:textColor="@color/black"
-            android:textColorHint="@color/gray_text"
-            android:inputType="text"/>
+            android:layout_marginBottom="12dp"
+            android:hint="Item Name">
 
-        <EditText
-            android:id="@+id/etCost"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:textColor="@color/black" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Cost Price"
-            android:textColor="@color/black"
-            android:textColorHint="@color/gray_text"
-            android:inputType="numberDecimal"/>
+            android:orientation="horizontal"
+            android:baselineAligned="false">
 
-        <EditText
-            android:id="@+id/etPrice"
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:layout_marginBottom="12dp"
+                android:hint="Cost Price">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etCost"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:textColor="@color/black" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:layout_marginBottom="12dp"
+                android:hint="Selling Price">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPrice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:textColor="@color/black" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Selling Price"
-            android:textColor="@color/black"
-            android:textColorHint="@color/gray_text"
-            android:inputType="numberDecimal"/>
+            android:orientation="horizontal"
+            android:baselineAligned="false">
 
-        <EditText
-            android:id="@+id/etQuantity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Initial Quantity"
-            android:textColor="@color/black"
-            android:textColorHint="@color/gray_text"
-            android:inputType="number"/>
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:layout_marginBottom="12dp"
+                android:hint="Stock Quantity">
 
-        <EditText
-            android:id="@+id/etLimit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Quantity Limit (Low Stock Warning)"
-            android:textColor="@color/black"
-            android:textColorHint="@color/gray_text"
-            android:inputType="number"/>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etQuantity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:textColor="@color/black" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:layout_marginBottom="12dp"
+                android:hint="Low Stock Limit">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etLimit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:textColor="@color/black" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:hintEnabled="true">
+            android:layout_marginBottom="12dp"
+            android:hint="Category">
 
             <AutoCompleteTextView
                 android:id="@+id/autoCompleteDialogCategory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Category"
                 android:inputType="text"
                 android:paddingHorizontal="12dp" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -76,21 +126,28 @@
             android:id="@+id/cbHasExpiration"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp"
             android:text="Has Expiration Date?"
             android:textColor="@color/black" />
 
-        <EditText
-            android:id="@+id/etExpirationDate"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilExpirationDate"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
             android:hint="Expiration Date (YYYY-MM-DD)"
-            android:textColor="@color/black"
-            android:textColorHint="@color/gray_text"
-            android:focusable="false"
-            android:clickable="true"
-            android:visibility="gone"
-            android:inputType="none"/>
+            android:visibility="gone">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etExpirationDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="false"
+                android:inputType="none"
+                android:textColor="@color/black" />
+        </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
 </ScrollView>

@@ -23,6 +23,7 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
         void onComplete(Reservation reservation);
         void onCancel(Reservation reservation);
         void onUndo(Reservation reservation);
+        void onItemClick(Reservation reservation);
     }
 
     public ReservationAdapter(List<Reservation> reservations, OnReservationActionListener listener) {
@@ -32,7 +33,7 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
 
     @NonNull
     @Override
-    public ReservationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ReservationViewHolder onCreateViewHolder(@NonNull android.view.ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_reservation, parent, false);
         return new ReservationViewHolder(view);
     }
@@ -41,6 +42,7 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
     public void onBindViewHolder(@NonNull ReservationViewHolder holder, int position) {
         Reservation reservation = reservations.get(position);
         holder.tvCustomerName.setText(reservation.customerName);
+        holder.tvContactInfo.setText(reservation.contactInfo);
         holder.tvProductName.setText(reservation.itemsSummary);
         holder.tvTotalPrice.setText(String.format(Locale.US, "Total: ₱%.2f", reservation.totalAmount));
         holder.tvPickupDate.setText("Date: " + dateFormat.format(new Date(reservation.timestamp)));
@@ -67,6 +69,7 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
         holder.btnCompleteReservation.setOnClickListener(v -> listener.onComplete(reservation));
         holder.btnCancelReservation.setOnClickListener(v -> listener.onCancel(reservation));
         holder.btnUndoReservation.setOnClickListener(v -> listener.onUndo(reservation));
+        holder.itemView.setOnClickListener(v -> listener.onItemClick(reservation));
     }
 
     @Override
@@ -80,12 +83,13 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
     }
 
     static class ReservationViewHolder extends RecyclerView.ViewHolder {
-        TextView tvCustomerName, tvProductName, tvTotalPrice, tvPickupDate, tvReservationStatus;
+        TextView tvCustomerName, tvContactInfo, tvProductName, tvTotalPrice, tvPickupDate, tvReservationStatus;
         MaterialButton btnCompleteReservation, btnCancelReservation, btnUndoReservation;
 
         public ReservationViewHolder(@NonNull View itemView) {
             super(itemView);
             tvCustomerName = itemView.findViewById(R.id.tvCustomerName);
+            tvContactInfo = itemView.findViewById(R.id.tvContactInfo);
             tvProductName = itemView.findViewById(R.id.tvProductName);
             tvTotalPrice = itemView.findViewById(R.id.tvTotalPrice);
             tvPickupDate = itemView.findViewById(R.id.tvPickupDate);

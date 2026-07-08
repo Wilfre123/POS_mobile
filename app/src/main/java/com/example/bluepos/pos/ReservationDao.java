@@ -19,7 +19,7 @@ public interface ReservationDao {
     void delete(Reservation reservation);
 
     @Query("SELECT * FROM reservations WHERE userId = :userId ORDER BY timestamp DESC")
-    List<Reservation> getAllReservations(int userId);
+    List<Reservation> getAllReservationsSync(int userId);
 
     @Query("SELECT * FROM reservations WHERE userId = :userId AND status = :status ORDER BY timestamp ASC")
     List<Reservation> getReservationsByStatus(int userId, String status);

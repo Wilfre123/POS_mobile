@@ -1,45 +1,45 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.bluepos">
 
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
         android:allowBackup="true"
-        android:label="POS &amp; LED Controller"
         android:icon="@mipmap/ic_launcher"
+        android:label="POS &amp; LED Controller"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.BluePOS">
+        android:theme="@style/Theme.GreenPOS">
 
-        <activity android:name="com.example.bluepos.LoginActivity"
+        <activity
+            android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name="com.example.bluepos.RegisterActivity"
+        <activity
+            android:name=".RegisterActivity"
             android:exported="false" />
 
-        <activity android:name="com.example.bluepos.ProductsActivity"
-            android:label="Products Management"
+        <activity
+            android:name=".MainActivity"
             android:exported="false" />
 
-        <activity android:name="com.example.bluepos.MainActivity"
-            android:exported="false">
-        </activity>
-
-        <activity android:name="com.example.bluepos.pos.POSActivity"
+        <activity
+            android:name=".pos.POSActivity"
+            android:exported="false"
             android:label="POS System"
-            android:exported="false" />
-
-        <activity android:name="com.example.bluepos.SettingsActivity"
-            android:label="Settings"
-            android:exported="false" />
+            android:windowSoftInputMode="adjustResize" />
 
     </application>
+
 </manifest>

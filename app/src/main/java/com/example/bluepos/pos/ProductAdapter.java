@@ -40,7 +40,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     @NonNull
     @Override
-    public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ProductViewHolder onCreateViewHolder(@NonNull android.view.ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_product, parent, false);
         return new ProductViewHolder(view);
     }
@@ -49,33 +49,40 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
         Product product = productList.get(position);
         holder.tvName.setText(product.name);
-        holder.tvPrice.setText(String.format(Locale.US, "₱%.2f", product.price));
-        
-        String stockInfo = "Stock: " + product.stock;
-        holder.tvStock.setText(stockInfo);
-        
-        if (product.stock <= product.minStock) {
+
+        if (isLowStockMode) {
+            holder.tvPrice.setVisibility(View.GONE);
+            holder.tvAddedToCartCount.setVisibility(View.GONE);
+            holder.btnAddToCart.setVisibility(View.GONE);
+            holder.tvStock.setText("Qty: " + product.stock);
             holder.tvStock.setTextColor(Color.RED);
         } else {
-            holder.tvStock.setTextColor(Color.GRAY);
-        }
+            holder.tvPrice.setVisibility(View.VISIBLE);
+            holder.tvPrice.setText(String.format(Locale.US, "₱%.2f", product.price));
 
-        Integer addedCount = cartQuantities.get(product.id);
-        if (addedCount != null && addedCount > 0) {
-            holder.tvAddedToCartCount.setVisibility(View.VISIBLE);
-            holder.tvAddedToCartCount.setText("Added: " + addedCount);
-        } else {
-            holder.tvAddedToCartCount.setVisibility(View.GONE);
+            Integer addedCount = cartQuantities.get(product.id);
+            if (addedCount == null) addedCount = 0;
+
+            int remainingStock = product.stock - addedCount;
+            holder.tvStock.setText("Stock: " + remainingStock);
+
+            if (remainingStock <= product.minStock) {
+                holder.tvStock.setTextColor(Color.RED);
+            } else {
+                holder.tvStock.setTextColor(Color.GRAY);
+            }
+
+            if (addedCount > 0) {
+                holder.tvAddedToCartCount.setVisibility(View.VISIBLE);
+                holder.tvAddedToCartCount.setText("Added: " + addedCount);
+            } else {
+                holder.tvAddedToCartCount.setVisibility(View.GONE);
+            }
+            holder.btnAddToCart.setVisibility(View.VISIBLE);
         }
 
         holder.btnAddToCart.setOnClickListener(v -> listener.onAddToCart(product));
         holder.itemView.findViewById(R.id.productItemLayout).setOnClickListener(v -> listener.onAddToCart(product));
-
-        if (isLowStockMode) {
-            holder.btnAddToCart.setVisibility(View.GONE);
-        } else {
-            holder.btnAddToCart.setVisibility(View.VISIBLE);
-        }
     }
 
     @Override

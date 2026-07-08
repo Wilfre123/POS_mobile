@@ -15,6 +15,9 @@ public interface ExpenseDao {
     @Query("SELECT * FROM expenses WHERE userId = :userId ORDER BY timestamp DESC")
     List<Expense> getAllExpenses(int userId);
 
+    @Query("SELECT * FROM expenses WHERE userId = :userId ORDER BY timestamp DESC")
+    List<Expense> getAllExpensesSync(int userId);
+
     @Query("SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE userId = :userId")
     double getTotalExpenses(int userId);
 
@@ -26,6 +29,9 @@ public interface ExpenseDao {
 
     @Delete
     void delete(Expense expense);
+
+    @Query("SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE userId = :userId AND timestamp >= :since")
+    double getExpensesSince(long since, int userId);
 
     @Query("UPDATE expenses SET userId = :userId")
     void updateUserIdForAll(int userId);

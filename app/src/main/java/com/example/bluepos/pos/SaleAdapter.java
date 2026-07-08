@@ -15,7 +15,7 @@ import java.util.Locale;
 public class SaleAdapter extends RecyclerView.Adapter<SaleAdapter.SaleViewHolder> {
 
     private List<Sale> sales;
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault());
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy hh:mm a", Locale.getDefault());
 
     public SaleAdapter(List<Sale> sales) {
         this.sales = sales;
@@ -28,7 +28,7 @@ public class SaleAdapter extends RecyclerView.Adapter<SaleAdapter.SaleViewHolder
 
     @NonNull
     @Override
-    public SaleViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public SaleViewHolder onCreateViewHolder(@NonNull android.view.ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_sale, parent, false);
         return new SaleViewHolder(view);
     }
@@ -40,6 +40,7 @@ public class SaleAdapter extends RecyclerView.Adapter<SaleAdapter.SaleViewHolder
         holder.tvDate.setText(dateFormat.format(new Date(sale.timestamp)));
         holder.tvItems.setText(sale.itemsSummary);
         holder.tvPayment.setText(String.format(Locale.US, "Paid: ₱%.2f | Change: ₱%.2f", sale.amountPaid, sale.change));
+        holder.tvUser.setText("Sold by: " + (sale.userName != null ? sale.userName : "Unknown"));
     }
 
     @Override
@@ -48,7 +49,7 @@ public class SaleAdapter extends RecyclerView.Adapter<SaleAdapter.SaleViewHolder
     }
 
     static class SaleViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTotal, tvDate, tvItems, tvPayment;
+        TextView tvTotal, tvDate, tvItems, tvPayment, tvUser;
 
         public SaleViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -56,6 +57,7 @@ public class SaleAdapter extends RecyclerView.Adapter<SaleAdapter.SaleViewHolder
             tvDate = itemView.findViewById(R.id.tvSaleDate);
             tvItems = itemView.findViewById(R.id.tvSaleItems);
             tvPayment = itemView.findViewById(R.id.tvSalePayment);
+            tvUser = itemView.findViewById(R.id.tvSaleUser);
         }
     }
 }

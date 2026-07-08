@@ -9,7 +9,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.bluepos.pos.AppDatabase;
+import com.example.bluepos.pos.POSActivity;
 import com.example.bluepos.pos.User;
+
+import com.google.android.material.textfield.TextInputEditText;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -22,8 +25,8 @@ public class LoginActivity extends AppCompatActivity {
 
         db = AppDatabase.getDatabase(this);
 
-        EditText etEmail = findViewById(R.id.etEmail);
-        EditText etPassword = findViewById(R.id.etPassword);
+        TextInputEditText etEmail = findViewById(R.id.etEmail);
+        TextInputEditText etPassword = findViewById(R.id.etPassword);
         Button btnLogin = findViewById(R.id.btnLogin);
         TextView tvRegister = findViewById(R.id.tvRegister);
 
@@ -40,9 +43,13 @@ public class LoginActivity extends AppCompatActivity {
                         .putInt("userId", user.id)
                         .putString("username", user.name)
                         .putString("userEmail", user.email)
+                        .putString("userRole", user.role)
+                        .putInt("adminId", user.adminId != null ? user.adminId : -1)
                         .apply();
 
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    Intent intent = new Intent(LoginActivity.this, POSActivity.class);
+                    intent.putExtra("TARGET_VIEW", "DASHBOARD");
+                    startActivity(intent);
                     finish();
                 } else {
                     Toast.makeText(this, "Incorrect email or password", Toast.LENGTH_SHORT).show();

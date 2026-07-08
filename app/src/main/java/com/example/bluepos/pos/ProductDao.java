@@ -13,8 +13,23 @@ public interface ProductDao {
     @Query("SELECT * FROM products WHERE userId = :userId")
     List<Product> getAll(int userId);
 
-    @Query("SELECT * FROM products WHERE userId = :userId AND name LIKE '%' || :query || '%'")
+    @Query("SELECT * FROM products WHERE userId = :userId")
+    List<Product> getAllProductsSync(int userId);
+
+    @Query("SELECT COUNT(*) FROM products WHERE userId = :userId")
+    int getTotalProductCount(int userId);
+
+    @Query("SELECT COUNT(*) FROM products WHERE userId = :userId AND stock <= minStock")
+    int getLowStockCount(int userId);
+
+    @Query("SELECT * FROM products WHERE userId = :userId AND stock <= minStock")
+    List<Product> getLowStockProducts(int userId);
+
+    @Query("SELECT * FROM products WHERE userId = :userId AND name LIKE :query")
     List<Product> searchProducts(int userId, String query);
+
+    @Query("SELECT * FROM products WHERE userId = :userId AND category LIKE :category AND name LIKE :query")
+    List<Product> searchProductsWithCategory(int userId, String category, String query);
 
     @Insert
     void insert(Product product);
@@ -30,6 +45,9 @@ public interface ProductDao {
 
     @Query("SELECT DISTINCT category FROM products WHERE userId = :userId")
     List<String> getUniqueCategories(int userId);
+
+    @Query("SELECT * FROM products WHERE userId = :userId AND category LIKE :category")
+    List<Product> getProductsByCategory(int userId, String category);
 
     @Query("UPDATE products SET userId = :userId")
     void updateUserIdForAll(int userId);

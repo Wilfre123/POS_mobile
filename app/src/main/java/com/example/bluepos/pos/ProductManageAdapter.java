@@ -28,7 +28,7 @@ public class ProductManageAdapter extends RecyclerView.Adapter<ProductManageAdap
 
     @NonNull
     @Override
-    public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ProductViewHolder onCreateViewHolder(@NonNull android.view.ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_product_manage, parent, false);
         return new ProductViewHolder(view);
     }

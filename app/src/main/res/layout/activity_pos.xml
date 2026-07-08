@@ -14,46 +14,39 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/primary_green"
-            app:titleTextColor="@color/white"
-            app:navigationIconTint="@color/white"
+            android:background="@color/white"
+            app:titleTextColor="@color/black"
+            app:navigationIconTint="@color/primary_green"
             app:layout_constraintTop_toTopOf="parent">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:paddingEnd="16dp">
+            <FrameLayout
+                android:id="@+id/btnNotification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless">
 
-                <FrameLayout
-                    android:id="@+id/btnNotification"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:background="?attr/selectableItemBackgroundBorderless">
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_margin="4dp"
+                    android:src="@android:drawable/ic_popup_reminder"
+                    app:tint="@color/primary_green" />
 
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:layout_margin="4dp"
-                        android:src="@android:drawable/ic_popup_reminder"
-                        app:tint="@color/white" />
-
-                    <TextView
-                        android:id="@+id/tvNotificationBadge"
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:layout_gravity="top|end"
-                        android:background="@drawable/badge_circle"
-                        android:gravity="center"
-                        android:text="0"
-                        android:textColor="@color/white"
-                        android:textSize="10sp"
-                        android:textStyle="bold"
-                        android:visibility="gone" />
-                </FrameLayout>
-            </RelativeLayout>
+                <TextView
+                    android:id="@+id/tvNotificationBadge"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="top|end"
+                    android:background="@drawable/badge_circle"
+                    android:gravity="center"
+                    android:text="0"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+            </FrameLayout>
         </androidx.appcompat.widget.Toolbar>
 
         <!-- Main Content Area -->
@@ -74,7 +67,7 @@
                     android:id="@+id/etSearch"
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
-                    android:layout_margin="12dp"
+                    android:layout_margin="8dp"
                     android:background="@drawable/search_bg"
                     android:drawableStart="@android:drawable/ic_menu_search"
                     android:drawablePadding="8dp"
@@ -90,7 +83,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_marginTop="8dp"
-                    android:paddingHorizontal="8dp"
+                    android:paddingHorizontal="4dp"
                     android:clipToPadding="false"
                     app:layout_constraintBottom_toTopOf="@id/bottom_bar"
                     app:layout_constraintTop_toBottomOf="@id/etSearch" />
@@ -102,7 +95,7 @@
                     android:background="@color/white"
                     android:elevation="8dp"
                     android:orientation="vertical"
-                    android:padding="12dp"
+                    android:padding="8dp"
                     app:layout_constraintBottom_toBottomOf="parent">
 
                     <LinearLayout
@@ -138,7 +131,7 @@
 
                         <EditText
                             android:id="@+id/etAmountPaid"
-                            android:layout_width="100dp"
+                            android:layout_width="120dp"
                             android:layout_height="45dp"
                             android:layout_marginEnd="8dp"
                             android:background="@drawable/search_bg"
@@ -167,7 +160,7 @@
                         android:text="Checkout"
                         android:textColor="@color/white"
                         android:textStyle="bold"
-                        app:cornerRadius="8dp" />
+                        app:cornerRadius="0dp" />
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -181,20 +174,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:paddingHorizontal="4dp"
+                    android:paddingVertical="4dp">
 
                     <!-- Financial Summary Card -->
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        app:cardCornerRadius="12dp"
+                        app:cardCornerRadius="0dp"
                         app:cardElevation="2dp">
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="16dp">
+                            android:padding="12dp">
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -273,8 +267,9 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
-                            android:layout_margin="4dp"
-                            app:cardCornerRadius="12dp">
+                            android:layout_marginHorizontal="4dp"
+                            android:layout_marginVertical="4dp"
+                            app:cardCornerRadius="0dp">
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -289,8 +284,9 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
-                            android:layout_margin="4dp"
-                            app:cardCornerRadius="12dp">
+                            android:layout_marginHorizontal="4dp"
+                            android:layout_marginVertical="4dp"
+                            app:cardCornerRadius="0dp">
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -305,8 +301,9 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
-                            android:layout_margin="4dp"
-                            app:cardCornerRadius="12dp">
+                            android:layout_marginHorizontal="4dp"
+                            android:layout_marginVertical="4dp"
+                            app:cardCornerRadius="0dp">
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -321,8 +318,9 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
-                            android:layout_margin="4dp"
-                            app:cardCornerRadius="12dp">
+                            android:layout_marginHorizontal="4dp"
+                            android:layout_marginVertical="4dp"
+                            app:cardCornerRadius="0dp">
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -338,12 +336,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        app:cardCornerRadius="12dp">
+                        app:cardCornerRadius="0dp">
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="16dp">
+                            android:padding="12dp">
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -361,12 +359,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        app:cardCornerRadius="12dp">
+                        app:cardCornerRadius="0dp">
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="16dp">
+                            android:padding="12dp">
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -384,12 +382,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        app:cardCornerRadius="12dp">
+                        app:cardCornerRadius="0dp">
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="16dp">
+                            android:padding="12dp">
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -418,20 +416,52 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:paddingHorizontal="4dp"
+                    android:paddingVertical="4dp">
+
+                    <!-- Visit Statistics Card -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        app:cardCornerRadius="0dp"
+                        app:cardElevation="2dp">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="12dp"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Statistics Visits"
+                                android:textStyle="bold"
+                                android:textColor="@color/gray_text"/>
+                            <TextView
+                                android:id="@+id/tvStatsVisitCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/primary_green"/>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
 
                     <!-- Financial Summary Card (Stats) -->
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        app:cardCornerRadius="12dp"
+                        app:cardCornerRadius="0dp"
                         app:cardElevation="2dp">
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="16dp">
+                            android:padding="12dp">
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -503,16 +533,16 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        app:cardCornerRadius="12dp">
+                        app:cardCornerRadius="0dp">
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="16dp">
+                            android:padding="12dp">
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Revenue vs Expenses (Last 15 Days)"
+                                android:text="Revenue vs Expenses Performance"
                                 android:textStyle="bold"
                                 android:layout_marginBottom="8dp"/>
                             <com.github.mikephil.charting.charts.LineChart
@@ -526,12 +556,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        app:cardCornerRadius="12dp">
+                        app:cardCornerRadius="0dp">
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="16dp">
+                            android:padding="12dp">
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -553,7 +583,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:padding="16dp"
+                android:padding="8dp"
                 android:visibility="gone">
                 <TextView
                     android:layout_width="wrap_content"
@@ -561,7 +591,7 @@
                     android:text="Reports"
                     android:textSize="20sp"
                     android:textStyle="bold"
-                    android:layout_marginBottom="16dp"/>
+                    android:layout_marginBottom="8dp"/>
                 <Button
                     android:id="@+id/btnExportProducts"
                     android:layout_width="match_parent"
@@ -580,7 +610,7 @@
                     android:id="@+id/tvSalesHeader"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
+                    android:layout_margin="8dp"
                     android:text="Sales History"
                     android:textSize="20sp"
                     android:textStyle="bold"
@@ -600,8 +630,31 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone">
-                <TextView android:id="@+id/tvReservationsHeader" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Reservations" android:layout_margin="16dp" android:textSize="20sp" android:textStyle="bold" app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"/>
-                <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvReservations" android:layout_width="match_parent" android:layout_height="0dp" app:layout_constraintTop_toBottomOf="@id/tvReservationsHeader" app:layout_constraintBottom_toTopOf="@id/btnAddReservation"/>
+                <TextView android:id="@+id/tvReservationsHeader" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Reservations" android:layout_margin="8dp" android:textSize="20sp" android:textStyle="bold" app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"/>
+
+                <EditText
+                    android:id="@+id/etSearchReservations"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_marginHorizontal="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/search_bg"
+                    android:drawableStart="@android:drawable/ic_menu_search"
+                    android:drawablePadding="8dp"
+                    android:hint="Search customer name..."
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/gray_text"
+                    android:paddingHorizontal="12dp"
+                    android:textSize="14sp"
+                    app:layout_constraintTop_toBottomOf="@id/tvReservationsHeader" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvReservations"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintTop_toBottomOf="@id/etSearchReservations"
+                    app:layout_constraintBottom_toTopOf="@id/btnAddReservation"/>
                 <Button android:id="@+id/btnAddReservation"
                     android:layout_width="wrap_content"
                     android:layout_height="56dp"
@@ -609,7 +662,7 @@
                     android:paddingHorizontal="32dp"
                     android:text="Add Reservation"
                     android:backgroundTint="@color/primary_green"
-                    app:cornerRadius="8dp"
+                    app:cornerRadius="0dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
@@ -621,8 +674,30 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone">
-                <TextView android:id="@+id/tvDebtsHeader" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Debts" android:layout_margin="16dp" android:textSize="20sp" android:textStyle="bold" app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"/>
-                <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvDebts" android:layout_width="match_parent" android:layout_height="0dp" app:layout_constraintTop_toBottomOf="@id/tvDebtsHeader" app:layout_constraintBottom_toTopOf="@id/btnAddDebt"/>
+                <TextView android:id="@+id/tvDebtsHeader" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Debts" android:layout_margin="8dp" android:textSize="20sp" android:textStyle="bold" app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"/>
+
+                <EditText
+                    android:id="@+id/etSearchDebts"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_marginHorizontal="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/search_bg"
+                    android:drawableStart="@android:drawable/ic_menu_search"
+                    android:drawablePadding="8dp"
+                    android:hint="Search customer name..."
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/gray_text"
+                    android:paddingHorizontal="12dp"
+                    android:textSize="14sp"
+                    app:layout_constraintTop_toBottomOf="@id/tvDebtsHeader" />
+
+                <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvDebts"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintTop_toBottomOf="@id/etSearchDebts"
+                    app:layout_constraintBottom_toTopOf="@id/btnAddDebt"/>
                 <Button android:id="@+id/btnAddDebt"
                     android:layout_width="wrap_content"
                     android:layout_height="56dp"
@@ -630,7 +705,7 @@
                     android:paddingHorizontal="32dp"
                     android:text="Add Debt"
                     android:backgroundTint="@color/primary_green"
-                    app:cornerRadius="8dp"
+                    app:cornerRadius="0dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
@@ -647,14 +722,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:paddingHorizontal="4dp"
+                    android:paddingVertical="4dp">
 
                     <androidx.cardview.widget.CardView
                         android:id="@+id/cardEditProfile"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
-                        app:cardCornerRadius="8dp"
+                        app:cardCornerRadius="0dp"
                         app:cardElevation="2dp"
                         android:clickable="true"
                         android:focusable="true"
@@ -686,7 +762,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
-                        app:cardCornerRadius="8dp"
+                        app:cardCornerRadius="0dp"
                         app:cardElevation="2dp"
                         android:clickable="true"
                         android:focusable="true"
@@ -718,7 +794,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
-                        app:cardCornerRadius="8dp"
+                        app:cardCornerRadius="0dp"
                         app:cardElevation="2dp"
                         android:clickable="true"
                         android:focusable="true"
@@ -749,7 +825,7 @@
                         android:id="@+id/cardResetData"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:cardCornerRadius="8dp"
+                        app:cardCornerRadius="0dp"
                         app:cardElevation="2dp"
                         android:clickable="true"
                         android:focusable="true"
@@ -779,7 +855,297 @@
                 </LinearLayout>
             </androidx.core.widget.NestedScrollView>
 
+            <!-- PRODUCTS CONTENT (Integrated from ProductsActivity) -->
+            <LinearLayout
+                android:id="@+id/products_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tabLayoutProducts"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    app:tabIndicatorColor="@color/primary_green"
+                    app:tabSelectedTextColor="@color/primary_green"
+                    app:tabTextColor="@color/gray_text">
+
+                    <com.google.android.material.tabs.TabItem
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Manage Product" />
+
+                    <com.google.android.material.tabs.TabItem
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Manage Expenses" />
+
+                    <com.google.android.material.tabs.TabItem
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Recent Capital &amp; Expenses" />
+                </com.google.android.material.tabs.TabLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <!-- Products Section -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/manage_products_section"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="4dp"
+                        android:visibility="visible">
+
+                        <LinearLayout
+                            android:id="@+id/filterLayoutProducts"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:background="@color/white"
+                            android:paddingHorizontal="4dp"
+                            android:paddingTop="12dp"
+                            android:paddingBottom="8dp"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <androidx.appcompat.widget.SearchView
+                                android:id="@+id/searchViewManage"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:background="@drawable/search_bg"
+                                app:iconifiedByDefault="false"
+                                app:queryHint="Search products..." />
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                                android:layout_width="200dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                app:hintEnabled="false">
+
+                                <AutoCompleteTextView
+                                    android:id="@+id/autoCompleteCategoryManage"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/search_bg"
+                                    android:hint="Category"
+                                    android:inputType="text"
+                                    android:paddingHorizontal="8dp"
+                                    android:textSize="14sp" />
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rvManageProducts"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:padding="4dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/filterLayoutProducts" />
+
+                        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                            android:id="@+id/fabAddProductManage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="16dp"
+                            android:src="@android:drawable/ic_input_add"
+                            app:backgroundTint="@color/primary_green"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:tint="@color/white" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <!-- Manage Expenses & Capital Section -->
+                    <androidx.core.widget.NestedScrollView
+                        android:id="@+id/manage_expenses_section"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#F0F4F7"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="2dp"
+                            android:paddingVertical="4dp">
+
+                            <!-- Overview Card -->
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/cardOverviewManage"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="16dp"
+                                app:cardCornerRadius="0dp"
+                                app:cardElevation="2dp"
+                                app:cardUseCompatPadding="true">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:padding="12dp">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="12dp"
+                                        android:text="Financial Overview"
+                                        android:textColor="@color/black"
+                                        android:textSize="16sp"
+                                        android:textStyle="bold" />
+
+                                    <GridLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:columnCount="2">
+
+                                        <LinearLayout
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_columnWeight="1"
+                                            android:layout_marginBottom="12dp"
+                                            android:orientation="vertical">
+                                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Today's Expenses" android:textSize="12sp" />
+                                            <TextView android:id="@+id/tvExpTodayManage" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="₱0.00" android:textColor="#F44336" android:textSize="16sp" android:textStyle="bold" />
+                                        </LinearLayout>
+
+                                        <LinearLayout
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_columnWeight="1"
+                                            android:layout_marginBottom="12dp"
+                                            android:orientation="vertical">
+                                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Expenses" android:textSize="12sp" />
+                                            <TextView android:id="@+id/tvExpTotalManage" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="₱0.00" android:textColor="#F44336" android:textSize="16sp" android:textStyle="bold" />
+                                        </LinearLayout>
+
+                                        <LinearLayout
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_columnWeight="1"
+                                            android:layout_marginBottom="12dp"
+                                            android:orientation="vertical">
+                                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Revenue" android:textSize="12sp" />
+                                            <TextView android:id="@+id/tvExpRevenueManage" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="₱0.00" android:textColor="@color/primary_green" android:textSize="16sp" android:textStyle="bold" />
+                                        </LinearLayout>
+
+                                        <LinearLayout
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_columnWeight="1"
+                                            android:orientation="vertical">
+                                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Net Income" android:textSize="12sp" />
+                                            <TextView android:id="@+id/tvExpNetManage" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="₱0.00" android:textColor="@color/black" android:textSize="16sp" android:textStyle="bold" />
+                                        </LinearLayout>
+                                    </GridLayout>
+                                </LinearLayout>
+                            </androidx.cardview.widget.CardView>
+
+                            <!-- Expense Input Card -->
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/cardAddExpenseManage"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="16dp"
+                                app:cardCornerRadius="0dp"
+                                app:cardElevation="2dp"
+                                app:cardUseCompatPadding="true">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:padding="12dp">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="12dp"
+                                        android:text="Add New Expense"
+                                        android:textColor="@color/black"
+                                        android:textSize="16sp"
+                                        android:textStyle="bold" />
+
+                                    <EditText
+                                        android:id="@+id/etExpenseTitleManage"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="45dp"
+                                        android:layout_marginBottom="12dp"
+                                        android:background="@drawable/search_bg"
+                                        android:hint="Expense Title (e.g., Rent, Utilities)"
+                                        android:textColor="@color/black"
+                                        android:textColorHint="@color/gray_text"
+                                        android:paddingHorizontal="12dp"
+                                        android:textSize="14sp" />
+
+                                    <EditText
+                                        android:id="@+id/etExpenseAmountManage"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="45dp"
+                                        android:layout_marginBottom="12dp"
+                                        android:background="@drawable/search_bg"
+                                        android:hint="Amount"
+                                        android:textColor="@color/black"
+                                        android:textColorHint="@color/gray_text"
+                                        android:inputType="numberDecimal"
+                                        android:paddingHorizontal="12dp"
+                                        android:textSize="14sp" />
+
+                                    <Button
+                                        android:id="@+id/btnAddExpenseManage"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="48dp"
+                                        android:backgroundTint="@color/primary_green"
+                                        android:text="Save Expense"
+                                        android:textColor="@color/white"
+                                        app:cornerRadius="0dp" />
+                                </LinearLayout>
+                            </androidx.cardview.widget.CardView>
+
+                        </LinearLayout>
+                    </androidx.core.widget.NestedScrollView>
+
+                    <!-- Recent Expenses History Section -->
+                    <androidx.core.widget.NestedScrollView
+                        android:id="@+id/manage_history_section"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#F0F4F7"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="2dp"
+                            android:paddingVertical="4dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8dp"
+                                android:text="Recent Expenses"
+                                android:textColor="@color/black"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/rvRecentExpensesManage"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent" />
+
+                        </LinearLayout>
+                    </androidx.core.widget.NestedScrollView>
+                </FrameLayout>
+            </LinearLayout>
+
             <!-- CART CONTENT -->
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cart_content"
                 android:layout_width="match_parent"
@@ -790,7 +1156,7 @@
                     android:id="@+id/etSearchCart"
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
-                    android:layout_margin="12dp"
+                    android:layout_margin="8dp"
                     android:background="@drawable/search_bg"
                     android:hint="Search in cart..."
                     android:paddingHorizontal="12dp"
@@ -802,7 +1168,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_marginTop="8dp"
-                    android:paddingHorizontal="8dp"
+                    android:paddingHorizontal="4dp"
                     android:clipToPadding="false"
                     app:layout_constraintBottom_toTopOf="@id/cart_bottom_bar"
                     app:layout_constraintTop_toBottomOf="@id/etSearchCart" />
@@ -814,7 +1180,7 @@
                     android:background="@color/white"
                     android:elevation="8dp"
                     android:orientation="vertical"
-                    android:padding="12dp"
+                    android:padding="8dp"
                     app:layout_constraintBottom_toBottomOf="parent">
 
                     <TextView
@@ -836,7 +1202,7 @@
                         android:text="Checkout"
                         android:textColor="@color/white"
                         android:textStyle="bold"
-                        app:cornerRadius="8dp" />
+                        app:cornerRadius="0dp" />
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 

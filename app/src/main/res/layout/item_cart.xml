@@ -4,15 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
-    app:cardCornerRadius="10dp"
+    app:cardCornerRadius="0dp"
     app:cardElevation="3dp"
     app:cardUseCompatPadding="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="110dp"
-        android:padding="12dp">
+        android:minHeight="100dp"
+        android:padding="8dp">
 
         <!-- Remove Button (Top-Right) -->
         <ImageButton

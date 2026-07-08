@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:padding="12dp">
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
@@ -20,19 +20,19 @@
             android:inputType="textPersonName" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Select Product"
-        android:textSize="14sp"
-        android:layout_marginBottom="4dp" />
-
-    <Spinner
-        android:id="@+id/spinnerDebtProduct"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
-        android:minHeight="48dp" />
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteDebtProduct"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Select Product"
+            android:completionThreshold="1" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
@@ -49,34 +49,28 @@
             android:text="1" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:layout_marginBottom="12dp">
 
-        <EditText
-            android:id="@+id/etDebtAmount"
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Debt Amount"
-            android:inputType="numberDecimal" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:text="Total Amount: "
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-        <EditText
-            android:id="@+id/etDebtNote"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tvDebtAmountDisplay"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Note (Optional)"
-            android:inputType="textMultiLine"
-            android:minLines="2"
-            android:gravity="top" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:text="₱0.00"
+            android:textSize="16sp"
+            android:textColor="@color/primary_dark_green"
+            android:textStyle="bold" />
+    </LinearLayout>
 
 </LinearLayout>
