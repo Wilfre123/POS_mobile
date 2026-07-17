@@ -195,7 +195,7 @@ public class POSActivity extends AppCompatActivity {
                 if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                     drawerLayout.closeDrawer(GravityCompat.START);
                 } else if (cashierContent.getVisibility() != View.VISIBLE) {
-                    switchContent(cashierContent, "GreenPOS System");
+                    switchContent(cashierContent, "Green POS System");
                 } else {
                     setEnabled(false);
                     getOnBackPressedDispatcher().onBackPressed();
@@ -414,7 +414,7 @@ public class POSActivity extends AppCompatActivity {
             refreshProductList();
             updateNotificationBadge();
             Toast.makeText(this, "Checkout successful", Toast.LENGTH_SHORT).show();
-            switchContent(cashierContent, "GreenPOS System");
+            switchContent(cashierContent, "Green POS System");
         };
 
         btnCheckout.setOnClickListener(checkoutListener);
@@ -493,7 +493,7 @@ public class POSActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_pos) {
-                switchContent(cashierContent, "GreenPOS System");
+                switchContent(cashierContent, "Green POS System");
             } else if (id == R.id.nav_dashboard) {
                 showDashboard();
             } else if (id == R.id.nav_reports) {
@@ -518,7 +518,7 @@ public class POSActivity extends AppCompatActivity {
         });
 
         // Set default view
-        switchContent(cashierContent, "GreenPOS System");
+        switchContent(cashierContent, "Green POS System");
         refreshProductList();
 
         // Handle target view from Intent
@@ -1278,7 +1278,7 @@ public class POSActivity extends AppCompatActivity {
 
         view.setVisibility(View.VISIBLE);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(title);
+            getSupportActionBar().setTitle("Green POS System");
         }
 
         if (btnViewCart != null) {
@@ -1292,7 +1292,7 @@ public class POSActivity extends AppCompatActivity {
                 toggle.setDrawerIndicatorEnabled(false);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 toggle.syncState();
-                toolbar.setNavigationOnClickListener(v -> switchContent(cashierContent, "GreenPOS System"));
+                toolbar.setNavigationOnClickListener(v -> switchContent(cashierContent, "Green POS System"));
             } else {
                 // For all other menu items, keep the hamburger toggle visible
                 toggle.setDrawerIndicatorEnabled(true);

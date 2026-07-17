@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">GreenPOS</string>
+    <string name="app_name">Green POS</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="bluepos_system_title">GreenPOS System</string>
+    <string name="bluepos_system_title">Green POS System</string>
     <string name="ecosystem_subtitle">Connected Arduino POS Ecosystem</string>
     <string name="pos_title">Point of Sale</string>
     <string name="inventory_title">Inventory Management</string>

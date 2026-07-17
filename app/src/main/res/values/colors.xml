@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary_green">#2E7D32</color>
-    <color name="primary_dark_green">#1B5E20</color>
-    <color name="accent_green">#4CAF50</color>
-    <color name="primary_light_green">#E8F5E9</color>
-    <color name="light_green_bg">#E8F5E9</color>
+    <!-- Modern Green Palette -->
+    <color name="primary_green">#006B54</color>
+    <color name="primary_dark_green">#00513F</color>
+    <color name="accent_green">#31BE9B</color>
+    <color name="primary_light_green">#D1E8E2</color>
+
+    <!-- Backgrounds & Surfaces -->
+    <color name="surface_variant">#F1F5F2</color>
+    <color name="light_green_bg">#FBFCFB</color>
     <color name="white">#FFFFFF</color>
-    <color name="black">#212121</color>
-    <color name="gray_text">#757575</color>
-    <color name="divider">#BDBDBD</color>
+
+    <!-- Typography -->
+    <color name="black">#191C1B</color>
+    <color name="gray_text">#5C625E</color>
+    <color name="divider">#E1E3E0</color>
+
+    <!-- Status colors -->
+    <color name="error">#BA1A1A</color>
+    <color name="success">#2E7D32</color>
+    <color name="warning">#EF6C00</color>
 </resources>

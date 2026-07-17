@@ -79,7 +79,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/bluepos_system_title"
+                    android:text="@string/app_name"
                     android:textSize="24sp"
                     android:textStyle="bold"
                     android:textColor="@color/primary_green"
@@ -106,8 +106,8 @@
                         android:layout_height="wrap_content"
                         android:layout_columnWeight="1"
                         android:layout_margin="8dp"
-                        app:cardCornerRadius="0dp"
-                        app:cardElevation="4dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="2dp"
                         android:foreground="?attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true">
@@ -129,8 +129,8 @@
                         android:layout_height="wrap_content"
                         android:layout_columnWeight="1"
                         android:layout_margin="8dp"
-                        app:cardCornerRadius="0dp"
-                        app:cardElevation="4dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="2dp"
                         android:foreground="?attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true">
@@ -154,8 +154,8 @@
                         android:layout_height="wrap_content"
                         android:layout_columnWeight="1"
                         android:layout_margin="8dp"
-                        app:cardCornerRadius="0dp"
-                        app:cardElevation="4dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="2dp"
                         android:foreground="?attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true">

@@ -13,6 +13,8 @@
         android:padding="12dp"
         android:background="@drawable/search_bg"
         android:layout_marginBottom="12dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/gray_text"
         android:textSize="14sp"/>
 
     <androidx.recyclerview.widget.RecyclerView

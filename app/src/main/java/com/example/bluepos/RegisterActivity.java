@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import com.google.android.material.textfield.TextInputEditText;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -33,9 +34,9 @@ public class RegisterActivity extends AppCompatActivity {
 
         db = AppDatabase.getDatabase(this);
 
-        EditText etName = findViewById(R.id.etName);
-        EditText etEmail = findViewById(R.id.etEmail);
-        EditText etPassword = findViewById(R.id.etPassword);
+        TextInputEditText etName = findViewById(R.id.etName);
+        TextInputEditText etEmail = findViewById(R.id.etEmail);
+        TextInputEditText etPassword = findViewById(R.id.etPassword);
         RadioGroup rgRole = findViewById(R.id.rgRole);
         RadioButton rbStaff = findViewById(R.id.rbStaff);
         Spinner spinnerAdmin = findViewById(R.id.spinnerAdmin);

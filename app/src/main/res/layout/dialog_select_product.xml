@@ -8,9 +8,15 @@
     <EditText
         android:id="@+id/etSearchProduct"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="45dp"
         android:hint="Search products..."
         android:drawableStart="@android:drawable/ic_menu_search"
+        android:drawablePadding="8dp"
+        android:background="@drawable/search_bg"
+        android:paddingHorizontal="12dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/gray_text"
+        android:textSize="14sp"
         android:layout_marginBottom="8dp" />
 
     <androidx.recyclerview.widget.RecyclerView

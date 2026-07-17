@@ -159,8 +159,7 @@
                         android:backgroundTint="@color/primary_green"
                         android:text="Checkout"
                         android:textColor="@color/white"
-                        android:textStyle="bold"
-                        app:cornerRadius="0dp" />
+                        android:textStyle="bold" />
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -267,8 +266,8 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
-                            android:layout_marginHorizontal="4dp"
-                            android:layout_marginVertical="4dp"
+                            android:layout_marginHorizontal="8dp"
+                            android:layout_marginVertical="8dp"
                             app:cardCornerRadius="0dp">
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -284,8 +283,8 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
-                            android:layout_marginHorizontal="4dp"
-                            android:layout_marginVertical="4dp"
+                            android:layout_marginHorizontal="8dp"
+                            android:layout_marginVertical="8dp"
                             app:cardCornerRadius="0dp">
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -301,8 +300,8 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
-                            android:layout_marginHorizontal="4dp"
-                            android:layout_marginVertical="4dp"
+                            android:layout_marginHorizontal="8dp"
+                            android:layout_marginVertical="8dp"
                             app:cardCornerRadius="0dp">
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -318,8 +317,8 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
-                            android:layout_marginHorizontal="4dp"
-                            android:layout_marginVertical="4dp"
+                            android:layout_marginHorizontal="8dp"
+                            android:layout_marginVertical="8dp"
                             app:cardCornerRadius="0dp">
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -662,7 +661,6 @@
                     android:paddingHorizontal="32dp"
                     android:text="Add Reservation"
                     android:backgroundTint="@color/primary_green"
-                    app:cornerRadius="0dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
@@ -705,7 +703,6 @@
                     android:paddingHorizontal="32dp"
                     android:text="Add Debt"
                     android:backgroundTint="@color/primary_green"
-                    app:cornerRadius="0dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
@@ -920,23 +917,24 @@
                                 app:iconifiedByDefault="false"
                                 app:queryHint="Search products..." />
 
-                            <com.google.android.material.textfield.TextInputLayout
-                                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                                android:layout_width="200dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                app:hintEnabled="false">
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.App.TextInputLayout.ExposedDropdownMenu"
+                            android:layout_width="200dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            app:hintEnabled="false">
 
-                                <AutoCompleteTextView
-                                    android:id="@+id/autoCompleteCategoryManage"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:background="@drawable/search_bg"
-                                    android:hint="Category"
-                                    android:inputType="text"
-                                    android:paddingHorizontal="8dp"
-                                    android:textSize="14sp" />
-                            </com.google.android.material.textfield.TextInputLayout>
+                            <AutoCompleteTextView
+                                android:id="@+id/autoCompleteCategoryManage"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/search_bg"
+                                android:hint="Category"
+                                android:inputType="text"
+                                android:paddingHorizontal="8dp"
+                                android:textColor="@color/black"
+                                android:textSize="14sp" />
+                        </com.google.android.material.textfield.TextInputLayout>
                         </LinearLayout>
 
                         <androidx.recyclerview.widget.RecyclerView
@@ -1102,8 +1100,7 @@
                                         android:layout_height="48dp"
                                         android:backgroundTint="@color/primary_green"
                                         android:text="Save Expense"
-                                        android:textColor="@color/white"
-                                        app:cornerRadius="0dp" />
+                                        android:textColor="@color/white" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
@@ -1201,8 +1198,7 @@
                         android:backgroundTint="@color/primary_green"
                         android:text="Checkout"
                         android:textColor="@color/white"
-                        android:textStyle="bold"
-                        app:cornerRadius="0dp" />
+                        android:textStyle="bold" />
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 

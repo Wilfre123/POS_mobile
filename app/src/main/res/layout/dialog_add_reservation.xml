@@ -10,28 +10,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        style="@style/Widget.App.TextInputLayout">
 
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etResCustomerName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Customer Name"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:textColor="@color/black" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        style="@style/Widget.App.TextInputLayout">
 
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etResContact"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Contact Number"
-            android:inputType="phone" />
+            android:inputType="phone"
+            android:textColor="@color/black" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -39,29 +41,31 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        style="@style/Widget.App.TextInputLayout.ExposedDropdownMenu">
 
         <AutoCompleteTextView
             android:id="@+id/autoCompleteResProduct"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Select Product"
-            android:completionThreshold="1" />
+            android:completionThreshold="1"
+            android:textColor="@color/black" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        style="@style/Widget.App.TextInputLayout">
 
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etResQuantity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Quantity"
             android:inputType="number"
-            android:text="1" />
+            android:text="1"
+            android:textColor="@color/black" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <LinearLayout

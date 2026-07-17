@@ -4,71 +4,93 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="12dp">
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ADD DEBT"
+        android:textStyle="bold"
+        android:textColor="@color/primary_green"
+        android:textSize="18sp"
+        android:layout_marginBottom="16dp"
+        android:letterSpacing="0.1"/>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        app:startIconDrawable="@android:drawable/ic_menu_myplaces"
+        app:startIconTint="@color/primary_green"
+        style="@style/Widget.App.TextInputLayout">
 
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etDebtCustomerName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Customer Name"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:textColor="@color/black" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        app:startIconDrawable="@android:drawable/ic_menu_search"
+        app:startIconTint="@color/primary_green"
+        style="@style/Widget.App.TextInputLayout.ExposedDropdownMenu">
 
         <AutoCompleteTextView
             android:id="@+id/autoCompleteDebtProduct"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Select Product"
-            android:completionThreshold="1" />
+            android:completionThreshold="1"
+            android:padding="16dp"
+            android:textColor="@color/black" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        app:startIconDrawable="@android:drawable/ic_menu_edit"
+        app:startIconTint="@color/primary_green"
+        style="@style/Widget.App.TextInputLayout">
 
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etDebtQuantity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Quantity"
             android:inputType="number"
-            android:text="1" />
+            android:text="1"
+            android:textColor="@color/black" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="8dp"
-        android:layout_marginBottom="12dp">
+        android:background="@color/light_green_bg"
+        android:padding="12dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Total Amount: "
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:text="TOTAL AMOUNT: "
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            android:textColor="@color/black"/>
 
         <TextView
             android:id="@+id/tvDebtAmountDisplay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="₱0.00"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textColor="@color/primary_dark_green"
             android:textStyle="bold" />
     </LinearLayout>
